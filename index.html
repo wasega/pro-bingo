@@ -70,6 +70,7 @@
                 <div class="pay-card">
                     <b>Telebirr</b>
                     <p>0904353530</p>
+                    <P>ABDULFETA<P>
                 </div>
             </div>
             <div class="form-group">
@@ -110,6 +111,28 @@
             </div>
         </section>
     </main>
+    <!-- Bingo Game Board Modal -->
+<div id="gameModal" class="game-modal" style="display: none;">
+    <div class="game-header">
+        <button class="back-btn" onclick="closeBingoRoom()">⬅</button>
+        <span id="selectedStake">10 ETB</span>
+        <span>Game ID: <b id="gameId">55</b></span>
+    </div>
+    
+    <div class="game-stats">
+        <div>Stake: <b id="stakeAmount">10 ETB</b></div>
+        <div>Derash: <b class="yellow-text" id="derashAmount">184 ETB</b></div>
+        <div>Status: <span class="green-text">Active</span></div>
+    </div>
+
+    <!-- 1-200/200 Bingo Numbers Board -->
+    <div class="bingo-grid" id="bingoGrid"></div>
+
+    <div class="overlay-message" id="overlayMessage">
+        <h3>ጨዋታው ተጀምሯል</h3>
+        <p>እባክዎ የሚቀጥለውን ዙር ይጠብቁ ወይም በሌላ መደብ ይጫወቱ።</p>
+    </div>
+</div>
 
     <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
