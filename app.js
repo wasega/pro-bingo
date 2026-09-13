@@ -1,13 +1,17 @@
-// 1. Supabase Initialization (የእርሶን URL እና KEY እዚህ ይተኩ)
-const SUPABASE_URL = "https://eritlinwsctlbmqhbyju.supabase.co";
+// 1. Supabase Initialization
+const SUPABASE_URL = "https://eritlinwsctlbmqhbyju.supabase.co"; 
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyaXRsaW53c2N0bGJtcWhieWp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTM5OTYsImV4cCI6MjEwNDg4OTk5Nn0.lLfbYZBEe6T0qry3xFJiWQGUxydd79LzfrMe8tc2ieo";
 
 let supabase = null;
-if (window.createSupabaseClient) {
-    supabase = window.createSupabaseClient(SUPABASE_URL, SUPABASE_KEY);
+try {
+    if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
+} catch (e) {
+    console.error("Supabase Init Error:", e);
 }
 
-// 2. Telegram Web App Initialization
+// 2. Telegram WebApp Data
 const tg = window.Telegram ? window.Telegram.WebApp : null;
 let currentUser = {
     id: 12345678,
@@ -20,8 +24,10 @@ if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
     currentUser = tg.initDataUnsafe.user;
 }
 
-// ገጹ ሲከፈት
+// ገጹ ሲጫን (Page Load)
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log("App Loaded");
+    
     const userNameElem = document.getElementById('userName');
     const userAvatarElem = document.getElementById('userAvatar');
     
@@ -33,38 +39,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// User Sync Function (የተስተካከለው)
+// 3. User Sync
 async function syncUserWithDatabase(user) {
     if (!supabase) return;
     try {
-        let { data } = await supabase.from('users').select('*').eq('telegram_id', user.id).maybeSingle();
+        let { data, error } = await supabase.from('users').select('*').eq('telegram_id', user.id).maybeSingle();
 
         if (!data) {
-            await supabase.from('users').insert([
+            const { data: newUser } = await supabase.from('users').insert([
                 { 
                     telegram_id: user.id, 
                     first_name: user.first_name, 
                     username: user.username || '' 
                 }
-            ]);
+            ]).select().maybeSingle();
+            data = newUser;
         }
 
-        // የነበረውን ዳታ ድጋሚ ማንበብ
-        let res = await supabase.from('users').select('*').eq('telegram_id', user.id).maybeSingle();
-        if (res.data) {
-            const formattedBalance = parseFloat(res.data.balance || 0).toFixed(2) + " ETB";
+        if (data) {
+            const formattedBalance = parseFloat(data.balance || 0).toFixed(2) + " ETB";
             const userBal = document.getElementById('userBalance');
             const profBal = document.getElementById('profileBalance');
             if (userBal) userBal.innerText = formattedBalance;
             if (profBal) profBal.innerText = formattedBalance;
         }
     } catch (err) {
-        console.error("Database error:", err);
+        console.error("User sync error:", err);
     }
 }
 
-// 3. Deposit Request Function (የተስተካከለው)
+// 4. Deposit Function (የተስተካከለው የዴፖዚት በተን)
 async function submitDeposit() {
+    console.log("submitDeposit function triggered!");
+    
     const transIdElem = document.getElementById('transId');
     const amountElem = document.getElementById('depositAmount');
 
@@ -76,13 +83,14 @@ async function submitDeposit() {
         return;
     }
 
-    alert("ጥያቄዎ በመላክ ላይ ነው...");
+    if (!supabase) {
+        alert("ከዳታቤዝ ጋር አልተገናኘም። እባክዎ የ Supabase ቁልፎችዎን ያረጋግጡ።");
+        return;
+    }
 
     try {
-        // 1. መጀመሪያ ተጠቃሚው መኖሩን ማረጋገጥ
         await syncUserWithDatabase(currentUser);
 
-        // 2. Deposit ጥያቄ ማስገባት
         const { data, error } = await supabase.from('transactions').insert([
             {
                 telegram_id: currentUser.id,
@@ -94,18 +102,22 @@ async function submitDeposit() {
         ]);
 
         if (error) {
-            alert("ስህተት ተፈጥሯል፦ " + (error.message || JSON.stringify(error)));
+            if (error.code === '23505') {
+                alert("ይህ የትራንዛክሽን ቁጥር ቀደም ብሎ ገብቷል!");
+            } else {
+                alert("ስህተት፦ " + error.message);
+            }
         } else {
             alert("ጥያቄዎ በትክክል ተልኳል! አድሚኑ ያረጋግጥልዎታል።");
             if (transIdElem) transIdElem.value = '';
             if (amountElem) amountElem.value = '';
         }
     } catch (err) {
-        alert("ስህተት፦ " + err);
+        alert("ስህተት ተፈጥሯል፦ " + err.message);
     }
 }
 
-// 4. Tab Switcher Function
+// 5. Tab Switcher Function (የተስተካከለው የታችኛው ታብ በተን)
 function switchTab(tabId, element) {
     const contents = document.querySelectorAll('.tab-content');
     contents.forEach(content => content.classList.remove('active'));
@@ -118,29 +130,35 @@ function switchTab(tabId, element) {
     if (element) element.classList.add('active');
 }
 
-// 5. Bingo Room Functions
+// 6. Bingo Room Modal Functions
 function openBingoRoom(stake = "10 ETB", derash = 0) {
-    document.getElementById('gameModal').style.display = 'block';
-    document.getElementById('selectedStake').innerText = stake;
-    document.getElementById('stakeAmount').innerText = stake;
-    document.getElementById('derashAmount').innerText = derash + " ETB";
+    const modal = document.getElementById('gameModal');
+    if (modal) modal.style.display = 'block';
+    
+    const stakeElem = document.getElementById('selectedStake');
+    const stakeAmtElem = document.getElementById('stakeAmount');
+    const derashElem = document.getElementById('derashAmount');
+    
+    if (stakeElem) stakeElem.innerText = stake;
+    if (stakeAmtElem) stakeAmtElem.innerText = stake;
+    if (derashElem) derashElem.innerText = derash + " ETB";
 
     const grid = document.getElementById('bingoGrid');
-    grid.innerHTML = '';
-
-    for (let i = 1; i <= 200; i++) {
-        const box = document.createElement('div');
-        box.className = 'number-box';
-        box.innerText = i;
-        
-        box.onclick = function() {
-            this.classList.toggle('selected');
-        };
-
-        grid.appendChild(box);
+    if (grid) {
+        grid.innerHTML = '';
+        for (let i = 1; i <= 200; i++) {
+            const box = document.createElement('div');
+            box.className = 'number-box';
+            box.innerText = i;
+            box.onclick = function() {
+                this.classList.toggle('selected');
+            };
+            grid.appendChild(box);
+        }
     }
 }
 
 function closeBingoRoom() {
-    document.getElementById('gameModal').style.display = 'none';
+    const modal = document.getElementById('gameModal');
+    if (modal) modal.style.display = 'none';
 }
