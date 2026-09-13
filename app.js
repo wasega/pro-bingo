@@ -23,6 +23,31 @@ function switchTab(tabId, element) {
     if(element) element.classList.add('active');
 }
 
-function openBingoRoom() {
-    alert("የቢንጎ ጨዋታ ክፍሎች በቅርቡ ይከፈታሉ!");
+function openBingoRoom(// ቢንጎ ክፍሉን መክፈቻ እና 100 ቁጥሮችን ሰሌዳው ላይ መፍጠሪያ
+function openBingoRoom(stake = "10 ETB") {
+    document.getElementById('gameModal').style.display = 'block';
+    document.getElementById('selectedStake').innerText = stake;
+    document.getElementById('stakeAmount').innerText = stake;
+
+    const grid = document.getElementById('bingoGrid');
+    grid.innerHTML = ''; // አሮጌውን ማጽጃ
+
+    // ከ 1 እስከ 100 ቁጥሮችን በራስ-ሰር ሰሌዳው ላይ መፍጠር
+    for (let i = 1; i <= 100; i++) {
+        const box = document.createElement('div');
+        box.className = 'number-box';
+        box.innerText = i;
+        
+        // ቁጥር ሲጫኑ መምረጫ
+        box.onclick = function() {
+            this.classList.toggle('selected');
+        };
+
+        grid.appendChild(box);
+    }
 }
+
+// የቢንጎ ክፍሉን መዝጊያ
+function closeBingoRoom() {
+    document.getElementById('gameModal').style.display = 'none';
+}) {
