@@ -182,8 +182,8 @@ function switchTab(tabId, element) {
 // 6. Bingo Room Functions
 // ==========================================
 function openBingoRoom(stake = "10 ETB", derash = 0) {
-    const modal = document.getElementById('gameModal');
-    if (modal) modal.style.display = 'block';
+    startBingoGameView(); // የቢንጎ ጨዋታ ገጹን ይከፍታል
+}
     
     const stakeElem = document.getElementById('selectedStake');
     const stakeAmtElem = document.getElementById('stakeAmount');
