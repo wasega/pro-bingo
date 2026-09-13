@@ -3,20 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo Bot App</title>
+    <title>Pro Bingo Bot</title>
     <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
-    <!-- Header Section -->
+    <!-- Top Header -->
     <header class="header">
         <div class="user-info">
-            <div class="avatar" id="userAvatar">K</div>
-            <div>
-                <div class="username" id="userName">User</div>
-                <div class="phone" id="userPhone">+2519...</div>
+            <div class="avatar-glow">
+                <div class="avatar" id="userAvatar">K</div>
+            </div>
+            <div class="user-details">
+                <span class="username" id="userName">Kk <i class="fa-solid fa-gem vip-icon"></i></span>
+                <span class="gift-box"><i class="fa-solid fa-gift"></i> 0 ETB</span>
             </div>
         </div>
         <div class="wallet-box">
@@ -25,64 +29,103 @@
         </div>
     </header>
 
-    <!-- Main Content Area -->
+    <!-- Navigation Line Bar -->
+    <div class="top-bar-divider"></div>
+
+    <!-- Main Content Container -->
     <main id="mainContent" class="content">
-        <!-- Games Section (Default) -->
+        <!-- Games Section -->
         <section id="gamesTab" class="tab-content active">
-            <div class="quick-actions">
-                <button class="btn btn-yellow" onclick="switchTab('depositTab')">Deposit</button>
-                <button class="btn btn-outline">Withdraw</button>
-                <button class="btn btn-outline">Invite</button>
-            </div>
-
-            <h3 class="section-title">ACTIVE GAMES</h3>
             
-            <!-- 4 Bingo Stake Rooms Grid -->
+            <!-- Quick Action Buttons -->
+            <div class="quick-actions">
+                <button class="btn btn-yellow pulse-btn" onclick="switchTab('depositTab')">Deposit</button>
+                <button class="btn btn-outline" onclick="switchTab('withdrawTab')">Withdraw</button>
+                <button class="btn btn-outline" onclick="switchTab('inviteTab')">Invite</button>
+            </div>
+
+            <!-- Active Bingo Cards Grid -->
             <div class="grid-2">
-                <div class="card stake-card">
-                    <div class="stake-title">መደብ 10 ETB</div>
-                    <span class="badge">BONUS</span>
-                    <div class="derash-info">ደራሽ - <span class="yellow-text">184 ETB</span></div>
-                    <div class="status-active">ACTIVE</div>
-                    <button class="btn btn-blue block" onclick="openBingoRoom('10 ETB', 184)">Join</button>
+                <!-- 10 ETB Card -->
+                <div class="card stake-card glow-card">
+                    <div class="card-header-row">
+                        <i class="fa-solid fa-coins coin-icon"></i>
+                        <span class="stake-title">መደብ 10 ETB</span>
+                    </div>
+                    <div class="badge-neon"><i class="fa-regular fa-star"></i> BONUS</div>
+                    <div class="derash-text"><i class="fa-solid fa-trophy trophy-icon"></i> ደራሽ - <span class="cyan-text">112 ETB</span></div>
+                    <div class="status-indicator active-pulse"><i class="fa-solid fa-wave-square"></i> ACTIVE</div>
+                    <button class="btn btn-blue glow-btn block" onclick="openBingoRoom('10 ETB', 112)">
+                        <i class="fa-solid fa-paper-plane"></i> Join
+                    </button>
                 </div>
 
-                <div class="card stake-card">
-                    <div class="stake-title">መደብ 20 ETB</div>
-                    <span class="badge">BONUS</span>
-                    <div class="derash-info">ደራሽ - <span class="yellow-text">0 ETB</span></div>
-                    <div class="status-waiting">WAITING</div>
-                    <button class="btn btn-blue block" onclick="openBingoRoom('20 ETB', 0)">Join</button>
+                <!-- 20 ETB Card -->
+                <div class="card stake-card glow-card">
+                    <div class="card-header-row">
+                        <i class="fa-solid fa-coins coin-icon"></i>
+                        <span class="stake-title">መደብ 20 ETB</span>
+                    </div>
+                    <div class="badge-neon"><i class="fa-regular fa-star"></i> BONUS</div>
+                    <div class="derash-text"><i class="fa-solid fa-trophy trophy-icon"></i> ደራሽ - <span class="cyan-text">20 ETB</span></div>
+                    <div class="status-indicator waiting-pulse"><i class="fa-solid fa-wave-square"></i> WAITING</div>
+                    <button class="btn btn-blue glow-btn block" onclick="openBingoRoom('20 ETB', 20)">
+                        <i class="fa-solid fa-paper-plane"></i> Join
+                    </button>
                 </div>
 
-                <div class="card stake-card">
-                    <div class="stake-title">መደብ 50 ETB</div>
-                    <span class="badge">BONUS</span>
-                    <div class="derash-info">ደራሽ - <span class="yellow-text">0 ETB</span></div>
-                    <div class="status-waiting">WAITING</div>
-                    <button class="btn btn-blue block" onclick="openBingoRoom('50 ETB', 0)">Join</button>
+                <!-- 50 ETB Card -->
+                <div class="card stake-card glow-card">
+                    <div class="card-header-row">
+                        <i class="fa-solid fa-coins coin-icon"></i>
+                        <span class="stake-title">መደብ 50 ETB</span>
+                    </div>
+                    <div class="badge-neon"><i class="fa-regular fa-star"></i> BONUS</div>
+                    <div class="derash-text"><i class="fa-solid fa-trophy trophy-icon"></i> ደራሽ - <span class="cyan-text">0 ETB</span></div>
+                    <div class="status-indicator waiting-pulse"><i class="fa-solid fa-wave-square"></i> WAITING</div>
+                    <button class="btn btn-blue glow-btn block" onclick="openBingoRoom('50 ETB', 0)">
+                        <i class="fa-solid fa-paper-plane"></i> Join
+                    </button>
                 </div>
 
-                <div class="card stake-card">
-                    <div class="stake-title">መደብ 100 ETB</div>
-                    <span class="badge">BONUS</span>
-                    <div class="derash-info">ደራሽ - <span class="yellow-text">0 ETB</span></div>
-                    <div class="status-waiting">WAITING</div>
-                    <button class="btn btn-blue block" onclick="openBingoRoom('100 ETB', 0)">Join</button>
+                <!-- 100 ETB Card -->
+                <div class="card stake-card glow-card">
+                    <div class="card-header-row">
+                        <i class="fa-solid fa-coins coin-icon"></i>
+                        <span class="stake-title">መደብ 100 ETB</span>
+                    </div>
+                    <div class="badge-neon"><i class="fa-regular fa-star"></i> BONUS</div>
+                    <div class="derash-text"><i class="fa-solid fa-trophy trophy-icon"></i> ደራሽ - <span class="cyan-text">0 ETB</span></div>
+                    <div class="status-indicator waiting-pulse"><i class="fa-solid fa-wave-square"></i> WAITING</div>
+                    <button class="btn btn-blue glow-btn block" onclick="openBingoRoom('100 ETB', 0)">
+                        <i class="fa-solid fa-paper-plane"></i> Join
+                    </button>
                 </div>
             </div>
 
-            <h3 class="section-title">FUTURE RELEASES</h3>
-            <div class="grid-2">
-                <div class="card coming-soon">
-                    <h4>Aviator</h4>
-                    <span>Coming Soon</span>
+            <!-- Banner Motion Slider -->
+            <div class="slider-container">
+                <div class="slider-wrapper" id="sliderWrapper">
+                    <div class="slide slide-1">
+                        <div class="banner-content">
+                            <h2>40</h2>
+                            <p>በቀጣዩ ዙር ይሳተፉና ያሸንፉ!</p>
+                        </div>
+                    </div>
+                    <div class="slide slide-2">
+                        <div class="banner-content">
+                            <h2>BINGO</h2>
+                            <p>100% ፈጣን ክፍያ በቴሌብር</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card coming-soon">
-                    <h4>Keno</h4>
-                    <span>Coming Soon</span>
+                <div class="slider-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
                 </div>
             </div>
+
         </section>
 
         <!-- Deposit Tab -->
@@ -90,11 +133,11 @@
             <h3>Deposit Funds</h3>
             <p class="subtitle">የክፍያ ዘዴ ይምረጡ</p>
             <div class="payment-methods">
-                <div class="pay-card">
-                    <b>CBE</b>
+                <div class="pay-card glow-card">
+                    <b>CBE Bank</b>
                     <p>1000202926308</p>
                 </div>
-                <div class="pay-card">
+                <div class="pay-card glow-card">
                     <b>Telebirr</b>
                     <p>0988818312</p>
                 </div>
@@ -102,18 +145,18 @@
             <div class="form-group">
                 <input type="text" placeholder="Paste SMS or Trans ID" id="transId">
                 <input type="number" placeholder="Amount" id="depositAmount">
-                <button class="btn btn-yellow block">ገቢ ጠይቅ</button>
+                <button class="btn btn-yellow block pulse-btn">ገቢ ጠይቅ</button>
             </div>
         </section>
 
         <!-- Leaderboard Tab -->
         <section id="leaderboardTab" class="tab-content">
             <h3>Leaderboard</h3>
-            <div class="leader-item">
+            <div class="leader-item glow-card">
                 <span>1. Lij Mayk</span>
                 <span class="yellow-text">8659 Plays</span>
             </div>
-            <div class="leader-item">
+            <div class="leader-item glow-card">
                 <span>2. Games pab</span>
                 <span class="yellow-text">6210 Plays</span>
             </div>
@@ -125,14 +168,14 @@
             <p>Enter your reward code</p>
             <div class="form-group">
                 <input type="text" placeholder="Enter combo code here">
-                <button class="btn btn-yellow block">Claim Reward</button>
+                <button class="btn btn-yellow block pulse-btn">Claim Reward</button>
             </div>
         </section>
 
         <!-- Profile Tab -->
         <section id="profileTab" class="tab-content">
             <h3>Profile</h3>
-            <div class="profile-card">
+            <div class="profile-card glow-card">
                 <p>Balance: <b id="profileBalance">0.00 ETB</b></p>
             </div>
         </section>
@@ -141,14 +184,14 @@
     <!-- Bingo Game Board Modal -->
     <div id="gameModal" class="game-modal" style="display: none;">
         <div class="game-header">
-            <button class="back-btn" onclick="closeBingoRoom()">⬅</button>
-            <span id="selectedStake">10 ETB</span>
-            <span>Game ID: <b id="gameId">669</b></span>
+            <button class="back-btn" onclick="closeBingoRoom()"><i class="fa-solid fa-arrow-left"></i></button>
+            <span id="selectedStake" class="stake-header">10 ETB</span>
+            <span>Game ID: <b id="gameId" class="yellow-text">669</b></span>
         </div>
         
-        <div class="game-stats">
+        <div class="game-stats glow-card">
             <div>Stake: <b id="stakeAmount">10 ETB</b></div>
-            <div>Derash: <b class="yellow-text" id="derashAmount">184 ETB</b></div>
+            <div>Derash: <b class="cyan-text" id="derashAmount">112 ETB</b></div>
             <div>Status: <span class="green-text">Active</span></div>
         </div>
 
@@ -163,11 +206,11 @@
 
     <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
-        <button class="nav-btn active" onclick="switchTab('gamesTab', this)">🎮<br>Games</button>
-        <button class="nav-btn" onclick="switchTab('depositTab', this)">💳<br>Deposit</button>
-        <button class="nav-btn" onclick="switchTab('leaderboardTab', this)">🏆<br>Leaderboard</button>
-        <button class="nav-btn" onclick="switchTab('shamoTab', this)">🎁<br>Shamo</button>
-        <button class="nav-btn" onclick="switchTab('profileTab', this)">👤<br>Profile</button>
+        <button class="nav-btn active" onclick="switchTab('gamesTab', this)"><i class="fa-solid fa-gamepad"></i><br>Games</button>
+        <button class="nav-btn" onclick="switchTab('depositTab', this)"><i class="fa-solid fa-wallet"></i><br>Deposit</button>
+        <button class="nav-btn" onclick="switchTab('leaderboardTab', this)"><i class="fa-solid fa-trophy"></i><br>Leaderboard</button>
+        <button class="nav-btn" onclick="switchTab('shamoTab', this)"><i class="fa-solid fa-gift"></i><br>Shamo</button>
+        <button class="nav-btn" onclick="switchTab('profileTab', this)"><i class="fa-solid fa-user"></i><br>Profile</button>
     </nav>
 
     <script src="app.js"></script>
