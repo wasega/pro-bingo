@@ -1,7 +1,6 @@
-// 1. Supabase Initialization (ቁልፎችህን እዚህ ተካ)
-const SUPABASE_URL = "https://eritlinwsctlbmqhbyju.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyaXRsaW53c2N0bGJtcWhieWp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTM5OTYsImV4cCI6MjEwNDg4OTk5Nn0.lLfbYZBEe6T0qry3xFJiWQGUxydd79LzfrMe8tc2ieo";
-
+// 1. Supabase Initialization (የእርሶን URL እና KEY እዚህ ይተኩ)
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY";
 
 let supabase = null;
 if (window.createSupabaseClient) {
@@ -34,36 +33,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// User Sync Function
+// User Sync Function (የተስተካከለው)
 async function syncUserWithDatabase(user) {
     if (!supabase) return;
     try {
         let { data } = await supabase.from('users').select('*').eq('telegram_id', user.id).maybeSingle();
 
         if (!data) {
-            const { data: newUser } = await supabase.from('users').insert([
+            await supabase.from('users').insert([
                 { 
                     telegram_id: user.id, 
                     first_name: user.first_name, 
                     username: user.username || '' 
                 }
             ]);
-            if (newUser && newUser[0]) data = newUser[0];
         }
 
-        if (data) {
-            const formattedBalance = parseFloat(data.balance || 0).toFixed(2) + " ETB";
+        // የነበረውን ዳታ ድጋሚ ማንበብ
+        let res = await supabase.from('users').select('*').eq('telegram_id', user.id).maybeSingle();
+        if (res.data) {
+            const formattedBalance = parseFloat(res.data.balance || 0).toFixed(2) + " ETB";
             const userBal = document.getElementById('userBalance');
             const profBal = document.getElementById('profileBalance');
             if (userBal) userBal.innerText = formattedBalance;
             if (profBal) profBal.innerText = formattedBalance;
         }
     } catch (err) {
-        console.error("Database connection error:", err);
+        console.error("Database error:", err);
     }
 }
 
-// 3. Deposit Request Function
+// 3. Deposit Request Function (የተስተካከለው)
 async function submitDeposit() {
     const transIdElem = document.getElementById('transId');
     const amountElem = document.getElementById('depositAmount');
@@ -76,7 +76,13 @@ async function submitDeposit() {
         return;
     }
 
+    alert("ጥያቄዎ በመላክ ላይ ነው...");
+
     try {
+        // 1. መጀመሪያ ተጠቃሚው መኖሩን ማረጋገጥ
+        await syncUserWithDatabase(currentUser);
+
+        // 2. Deposit ጥያቄ ማስገባት
         const { data, error } = await supabase.from('transactions').insert([
             {
                 telegram_id: currentUser.id,
@@ -88,14 +94,14 @@ async function submitDeposit() {
         ]);
 
         if (error) {
-            alert("ስህተት፡ " + error.message);
+            alert("ስህተት ተፈጥሯል፦ " + (error.message || JSON.stringify(error)));
         } else {
-            alert("የገቢ ጥያቄዎ በትክክል ተልኳል!");
+            alert("ጥያቄዎ በትክክል ተልኳል! አድሚኑ ያረጋግጥልዎታል።");
             if (transIdElem) transIdElem.value = '';
             if (amountElem) amountElem.value = '';
         }
     } catch (err) {
-        alert("ጥያቄው ተልኳል!");
+        alert("ስህተት፦ " + err);
     }
 }
 
