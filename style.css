@@ -2,39 +2,74 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    background-color: #121212;
+    background-color: #08080c;
     color: #ffffff;
-    padding-bottom: 70px;
+    padding-bottom: 75px;
+    user-select: none;
 }
 
+/* Header */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
-    background-color: #1e1e1e;
-    border-bottom: 2px solid #ffcc00;
+    padding: 12px 15px;
+    background-color: #0f0f15;
 }
 
 .user-info {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+}
+
+.avatar-glow {
+    position: relative;
+    border-radius: 50%;
+    padding: 2px;
+    background: linear-gradient(45deg, #ba68c8, #ff4081);
+    box-shadow: 0 0 10px rgba(186, 104, 200, 0.5);
 }
 
 .avatar {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     background-color: #ba68c8;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
+    font-size: 18px;
+    color: #fff;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.username {
+    font-weight: bold;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.vip-icon {
+    color: #00e5ff;
+    font-size: 11px;
+}
+
+.gift-box {
+    font-size: 11px;
+    color: #aa70e0;
+    margin-top: 2px;
 }
 
 .wallet-box {
@@ -43,27 +78,42 @@ body {
 
 .wallet-label {
     display: block;
-    font-size: 12px;
-    color: #aaa;
+    font-size: 11px;
+    color: #888;
 }
 
 .wallet-amount {
     color: #00ff66;
     font-weight: bold;
+    font-size: 15px;
+    text-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
 }
 
+.top-bar-divider {
+    height: 2px;
+    background: linear-gradient(90deg, #ffcc00, #ff4081, #00e5ff);
+}
+
+/* Content Area */
 .content {
     padding: 15px;
 }
 
 .tab-content {
     display: none;
+    animation: fadeIn 0.3s ease-in-out;
 }
 
 .tab-content.active {
     display: block;
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Quick Buttons */
 .quick-actions {
     display: flex;
     gap: 10px;
@@ -76,123 +126,245 @@ body {
     border: none;
     font-weight: bold;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .btn-yellow {
     background-color: #ffcc00;
     color: #000;
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
 }
 
 .btn-outline {
-    background-color: transparent;
-    border: 1px solid #444;
+    background-color: #161622;
+    border: 1px solid #2a2a3c;
+    color: #fff;
+}
+
+.btn-blue {
+    background: linear-gradient(135deg, #2979ff, #1565c0);
     color: #fff;
 }
 
 .btn.block {
     width: 100%;
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
-.section-title {
-    margin: 15px 0 10px 0;
-    font-size: 14px;
-    color: #888;
-}
-
-.card {
-    background-color: #1e1e1e;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-
-.active-game-card {
-    background: linear-gradient(135deg, #1e1e1e, #332b00);
-    border: 1px solid #ffcc00;
-}
-
+/* Grid & Cards (Abol Bingo Style) */
 .grid-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 12px;
 }
 
-.coming-soon {
-    opacity: 0.5;
-    text-align: center;
-}
-
-.payment-methods {
-    display: flex;
-    gap: 10px;
-    margin: 15px 0;
-}
-
-.pay-card {
-    background-color: #1e1e1e;
-    border: 1px solid #ffcc00;
-    padding: 10px;
-    border-radius: 8px;
-    flex: 1;
-}
-
-.form-group input {
-    width: 100%;
+.glow-card {
+    background-color: #12121a;
+    border: 1px solid #242436;
+    border-radius: 12px;
     padding: 12px;
-    margin-bottom: 10px;
-    background-color: #1e1e1e;
-    border: 1px solid #333;
-    color: #fff;
-    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s, border-color 0.2s;
 }
 
-.leader-item {
+.glow-card:active {
+    transform: scale(0.98);
+}
+
+.stake-card {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    padding: 12px;
-    background-color: #1e1e1e;
-    margin-bottom: 8px;
-    border-radius: 8px;
+}
+
+.card-header-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.coin-icon {
+    color: #ff4081;
+    font-size: 13px;
+}
+
+.stake-title {
+    color: #ff4081;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Glowing Neon Badge */
+.badge-neon {
+    align-self: flex-start;
+    margin: 8px 0 6px 0;
+    padding: 3px 8px;
+    border-radius: 15px;
+    border: 1px solid #00ff66;
+    color: #00ff66;
+    font-size: 10px;
+    font-weight: bold;
+    box-shadow: 0 0 8px rgba(0, 255, 102, 0.3);
+    background: rgba(0, 255, 102, 0.05);
+}
+
+.derash-text {
+    font-size: 12px;
+    color: #bbb;
+    margin-bottom: 6px;
+}
+
+.trophy-icon {
+    color: #00e5ff;
+}
+
+.cyan-text {
+    color: #00e5ff;
+    font-weight: bold;
 }
 
 .yellow-text {
     color: #ffcc00;
 }
 
+/* Pulse Motion Statuses */
+.status-indicator {
+    font-size: 11px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.active-pulse {
+    color: #00ff66;
+    animation: pulseGlow 1.5s infinite alternate;
+}
+
+.waiting-pulse {
+    color: #8888a0;
+}
+
+@keyframes pulseGlow {
+    from { opacity: 0.6; text-shadow: 0 0 2px #00ff66; }
+    to { opacity: 1; text-shadow: 0 0 8px #00ff66; }
+}
+
+.glow-btn {
+    box-shadow: 0 0 12px rgba(41, 121, 255, 0.4);
+    border: none;
+}
+
+/* Animated Banner Slider */
+.slider-container {
+    margin-top: 20px;
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    height: 150px;
+    background: linear-gradient(135deg, #d97706, #ffcc00);
+    box-shadow: 0 4px 20px rgba(217, 119, 6, 0.3);
+}
+
+.slider-wrapper {
+    display: flex;
+    width: 200%;
+    height: 100%;
+    animation: slideMotion 8s infinite ease-in-out;
+}
+
+.slide {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.banner-content h2 {
+    font-size: 50px;
+    color: #111;
+    font-weight: 900;
+    text-shadow: 2px 2px 0px rgba(255,255,255,0.4);
+}
+
+.banner-content p {
+    color: #222;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+@keyframes slideMotion {
+    0%, 45% { transform: translateX(0%); }
+    50%, 95% { transform: translateX(-50%); }
+    100% { transform: translateX(0%); }
+}
+
+.slider-dots {
+    position: absolute;
+    bottom: 8px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 50%;
+}
+
+.dot.active {
+    background: #000;
+    width: 14px;
+    border-radius: 10px;
+}
+
+/* Bottom Navigation Bar */
 .bottom-nav {
     position: fixed;
     bottom: 0;
     width: 100%;
-    background-color: #1e1e1e;
+    background-color: #0f0f15;
     display: flex;
     justify-content: space-around;
-    padding: 8px 0;
-    border-top: 1px solid #333;
+    padding: 10px 0;
+    border-top: 1px solid #1f1f2e;
+    z-index: 90;
 }
 
 .nav-btn {
     background: none;
     border: none;
-    color: #888;
-    font-size: 11px;
+    color: #666680;
+    font-size: 10px;
     cursor: pointer;
+    transition: color 0.2s;
+}
+
+.nav-btn i {
+    font-size: 18px;
+    margin-bottom: 3px;
 }
 
 .nav-btn.active {
     color: #ffcc00;
+    text-shadow: 0 0 10px rgba(255, 204, 0, 0.4);
 }
 
-/* --- Bingo Game Board Styles (Updated for 200 Numbers) --- */
+/* Bingo Game Modal Styles */
 .game-modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #121212;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: #08080c;
     z-index: 100;
-    padding: 10px;
+    padding: 12px;
     overflow-y: auto;
 }
 
@@ -201,7 +373,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding-bottom: 10px;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid #222;
 }
 
 .back-btn {
@@ -212,18 +384,17 @@ body {
     cursor: pointer;
 }
 
+.stake-header {
+    font-weight: bold;
+    font-size: 16px;
+    color: #ff4081;
+}
+
 .game-stats {
     display: flex;
     justify-content: space-between;
-    background-color: #1e1e1e;
-    padding: 10px;
-    border-radius: 8px;
-    margin: 10px 0;
+    margin: 12px 0;
     font-size: 12px;
-}
-
-.green-text {
-    color: #00ff66;
 }
 
 .bingo-grid {
@@ -231,7 +402,7 @@ body {
     grid-template-columns: repeat(10, 1fr);
     gap: 3px;
     margin-top: 10px;
-    padding-bottom: 20px;
+    padding-bottom: 30px;
 }
 
 .number-box {
@@ -245,69 +416,24 @@ body {
     font-weight: bold;
     border-radius: 3px;
     cursor: pointer;
-    user-select: none;
+    transition: transform 0.1s;
 }
 
 .number-box.selected {
     background-color: #000000;
     border: 1px solid #ffcc00;
     color: #ffcc00;
+    box-shadow: 0 0 6px rgba(255, 204, 0, 0.6);
 }
 
 .overlay-message {
     position: fixed;
-    top: 45%;
-    left: 5%;
-    right: 5%;
-    background: rgba(0, 0, 0, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    top: 45%; left: 5%; right: 5%;
+    background: rgba(10, 10, 16, 0.92);
+    border: 1px solid rgba(255, 204, 0, 0.3);
     padding: 20px;
-    border-radius: 12px;
+    border-radius: 14px;
     text-align: center;
-    backdrop-filter: blur(5px);
-}
-
-.stake-card {
-    border: 1px solid #333;
-    text-align: center;
-    padding: 12px;
-}
-
-.stake-title {
-    color: #ff4081;
-    font-weight: bold;
-    font-size: 13px;
-    margin-bottom: 5px;
-}
-
-.badge {
-    background-color: transparent;
-    border: 1px solid #00ff66;
-    color: #00ff66;
-    font-size: 9px;
-    padding: 2px 6px;
-    border-radius: 4px;
-}
-
-.derash-info {
-    font-size: 11px;
-    margin: 8px 0;
-    color: #aaa;
-}
-
-.status-active {
-    color: #00ff66;
-    font-size: 10px;
-    margin-bottom: 8px;
-}
-
-.status-waiting {
-    color: #aaa;
-    font-size: 10px;
-    margin-bottom: 8px;
-}
-
-.btn-blue {
-    background-color: #2196f3;
-    color: #fff;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
 }
