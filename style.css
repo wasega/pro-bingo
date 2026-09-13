@@ -437,3 +437,8 @@ body {
     backdrop-filter: blur(8px);
     box-shadow: 0 0 20px rgba(0,0,0,0.8);
 }
+
+button, .nav-btn, .number-box {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
