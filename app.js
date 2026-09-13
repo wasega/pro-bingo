@@ -209,6 +209,103 @@ function openBingoRoom(stake = "10 ETB", derash = 0) {
 }
 
 function closeBingoRoom() {
+
+    // ==========================================
+// BINGO LIVE GAME ENGINE logic
+// ==========================================
+let currentGameState = {
+    gameId: "DBAP1Q6F",
+    calledNumbers: [],
+    currentBall: null,
+    pot: 0,
+    players: 0,
+    stake: 10
+};
+
+// 1-75 ቦርድ መፍጠሪያ
+function render75Board() {
+    const grid = document.getElementById('board75Grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    for (let i = 1; i <= 75; i++) {
+        const cell = document.createElement('div');
+        cell.id = `ball-${i}`;
+        cell.innerText = i;
+        cell.style.cssText = "background:#2a244d; border-radius:4px; padding:6px 0; font-size:11px; font-weight:bold; text-align:center; color:#aaa;";
+        grid.appendChild(cell);
+    }
+}
+
+// ቁጥር ሲወጣ ቦርዱ ላይ ማብራት (Highlighting)
+function callNextNumber(num) {
+    if (!num || currentGameState.calledNumbers.includes(num)) return;
+
+    currentGameState.calledNumbers.push(num);
+    currentGameState.currentBall = num;
+
+    // የደብዳቤ መለያ ማውጣት (B, I, N, G, O)
+    let letter = '';
+    if (num <= 15) letter = 'B';
+    else if (num <= 30) letter = 'I';
+    else if (num <= 45) letter = 'N';
+    else if (num <= 60) letter = 'G';
+    else letter = 'O';
+
+    const formattedBall = `${letter}-${num}`;
+
+    // 1. Big Ball ማሳየት
+    const ballElem = document.getElementById('currentBallDisplay');
+    if (ballElem) ballElem.innerText = formattedBall;
+
+    // 2. ቦርድ ላይ ቀለሙን መቀየር (Green/Orange highlight)
+    const cell = document.getElementById(`ball-${num}`);
+    if (cell) {
+        cell.style.background = "#10b981"; // አረንጓዴ ቀለም
+        cell.style.color = "#fff";
+    }
+
+    // 3. ቆጣሪዎችን ማሻሻል
+    const countElem = document.getElementById('calledCount');
+    if (countElem) countElem.innerText = currentGameState.calledNumbers.length;
+}
+
+// ጨዋታውን መጀመር እና 75 ቦርድ ማዘጋጀት
+function startBingoGameView() {
+    const gameScreen = document.getElementById('bingoGameScreen');
+    if (gameScreen) gameScreen.style.display = 'block';
+
+    render75Board();
+    
+    // ለሙከራ ቁጥር በየ 3 ሰከንዱ እንዲወጣ ማድረግ (Simulate Server Calls)
+    let testNumber = 1;
+    const interval = setInterval(() => {
+        if (currentGameState.calledNumbers.length >= 75) {
+            clearInterval(interval);
+            showWinnerModal(); // ጨዋታው ሲያልቅ አሸናፊ ማሳየት
+            return;
+        }
+        let randomNum = Math.floor(Math.random() * 75) + 1;
+        while(currentGameState.calledNumbers.includes(randomNum)) {
+            randomNum = Math.floor(Math.random() * 75) + 1;
+        }
+        callNextNumber(randomNum);
+    }, 3000);
+}
+
+// አሸናፊዎች ሲወጡ የሚታይ Modal (ምስል 2)
+function showWinnerModal() {
+    alert("🎉 BINGO! 2 PLAYERS WON!\n አሸናፊዎች፦ Rahwa Emiru & Mesfen Mesfen");
+}
+
+function leaveGame() {
+    const gameScreen = document.getElementById('bingoGameScreen');
+    if (gameScreen) gameScreen.style.display = 'none';
+}
+
+function refreshGame() {
+    location.reload();
+}
     const modal = document.getElementById('gameModal');
     if (modal) modal.style.display = 'none';
 }
