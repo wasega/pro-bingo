@@ -29,36 +29,45 @@ async function supabaseFetch(endpoint, options = {}) {
 }
 
 // ==========================================
-// 2. Telegram WebApp Setup (የተስተካከለ)
+// 2. Telegram WebApp Only Setup (የተስተካከለ)
 // ==========================================
-let currentUser = { id: 12345678, first_name: "Test User", username: "testuser" };
+let currentUser = null; // የ Test User መረጃ ሙሉ በሙሉ ተወግዷል
 
 function initTelegramUser() {
-    // Telegram WebApp ዝግጁ መሆኑን ማረጋገጥ
     if (window.Telegram && window.Telegram.WebApp) {
         const tg = window.Telegram.WebApp;
         
-        tg.ready();  // ቴሌግራም አፑን እንዲዘጋጅ ያደርጋል
-        tg.expand(); // አፑን ሙሉ ስክሪን ያደርጋል
+        tg.ready();  // ቴሌግራም ዝግጁ መሆኑን ማረጋገጥ
+        tg.expand(); // አፑን ሙሉ ስክሪን ማድረግ
 
-        // እውነተኛው ተጠቃሚ መኖሩን ማረጋገጥ
+        // ከቴሌግራም የእውነተኛ ተጠቃሚ መረጃ ማውጣት
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             currentUser = tg.initDataUnsafe.user;
             console.log("Real Telegram User Successfully Loaded:", currentUser);
-        } else {
-            console.warn("Telegram initDataUnsafe empty. Running in browser mode.");
+            return true;
         }
-    } else {
-        console.warn("Telegram WebApp Script not detected.");
     }
+    return false;
 }
 
-// ገጹ ሙሉ በሙሉ ተጭኖ ሲያልቅ
+// ገጹ ሲከፈት (Page Load)
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. መጀመሪያ የቴሌግራም ተጠቃሚ መረጃን ማውጣት
-    initTelegramUser();
+    // 1. የቴሌግራም ተጠቃሚ መኖሩን ማረጋገጥ
+    const isTelegram = initTelegramUser();
 
-    // 2. በስክሪኑ ላይ የይዘት ስሞችን ማሳየት
+    // ቴሌግራም ካልሆነ አፑን እንዳይሰራ ማድረግ
+    if (!isTelegram || !currentUser) {
+        document.body.innerHTML = `
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#121026; color:#fff; text-align:center; padding:20px; font-family:sans-serif;">
+                <h2 style="color:#ef4444;">⚠️ መግባት አልተቻለም!</h2>
+                <p>ይህ አፕሊኬሽን የሚሰራው በ <strong>Telegram Bot</strong> በኩል ሲከፈት ብቻ ነው።</p>
+                <p style="font-size:12px; color:#aaa; margin-top:10px;">እባክዎን አፑን ዘግተው በቴሌግራም ቦትዎ በኩል ይክፈቱት።</p>
+            </div>
+        `;
+        return;
+    }
+
+    // 2. በስክሪኑ ላይ የእውነተኛ ተጠቃሚ ስምና ፕሮፋይል ማሳየት
     const userNameElem = document.getElementById('userName');
     const userAvatarElem = document.getElementById('userAvatar');
     
