@@ -1,42 +1,50 @@
-// 1. Supabase Initialization
-const SUPABASE_URL = "https://eritlinwsctlbmqhbyju.supabase.co"; // የራሶትን ተካ
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyaXRsaW53c2N0bGJtcWhieWp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTM5OTYsImV4cCI6MjEwNDg4OTk5Nn0.lLfbYZBEe6T0qry3xFJiWQGUxydd79LzfrMe8tc2ieo"; // የራሶትን ተካ
+// 1. Supabase Initialization (ቁልፎችህን እዚህ ተካ)
+const SUPABASE_URL = "https://eritlinwsctlbmqhbyju.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyaXRsaW53c2N0bGJtcWhieWp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTM5OTYsImV4cCI6MjEwNDg4OTk5Nn0.lLfbYZBEe6T0qry3xFJiWQGUxydd79LzfrMe8tc2ieo";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let supabase = null;
+
+// Supabase በትክክል መጫኑን ማረጋገጫ
+try {
+    if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        console.log("Supabase connected successfully!");
+    } else {
+        console.error("Supabase library loading failed.");
+    }
+} catch (e) {
+    console.error("Supabase Init Error: ", e);
+}
 
 // 2. Telegram Web App Initialization
 const tg = window.Telegram ? window.Telegram.WebApp : null;
-let currentUser = null;
+let currentUser = {
+    id: 12345678,
+    first_name: "Test User",
+    username: "testuser"
+};
 
-if (tg) {
+if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
     tg.expand();
-    currentUser = tg.initDataUnsafe ? tg.initDataUnsafe.user : null;
-}
-
-// የቴሌግራም መረጃ ከሌለ ለሙከራ ጊዜያዊ ID መስጠት
-if (!currentUser) {
-    currentUser = {
-        id: 12345678,
-        first_name: "Test User",
-        username: "testuser"
-    };
+    currentUser = tg.initDataUnsafe.user;
 }
 
 // ገጹ ሲከፈት
 document.addEventListener('DOMContentLoaded', async () => {
-    if (currentUser) {
-        const userNameElem = document.getElementById('userName');
-        const userAvatarElem = document.getElementById('userAvatar');
-        
-        if (userNameElem) userNameElem.innerHTML = `${currentUser.first_name} <i class="fa-solid fa-gem vip-icon"></i>`;
-        if (userAvatarElem) userAvatarElem.innerText = currentUser.first_name.charAt(0);
-        
+    const userNameElem = document.getElementById('userName');
+    const userAvatarElem = document.getElementById('userAvatar');
+    
+    if (userNameElem) userNameElem.innerHTML = `${currentUser.first_name} <i class="fa-solid fa-gem vip-icon"></i>`;
+    if (userAvatarElem) userAvatarElem.innerText = currentUser.first_name.charAt(0);
+
+    if (supabase) {
         await syncUserWithDatabase(currentUser);
     }
 });
 
 // User Sync Function
 async function syncUserWithDatabase(user) {
+    if (!supabase) return;
     try {
         let { data, error } = await supabase
             .from('users')
@@ -45,7 +53,7 @@ async function syncUserWithDatabase(user) {
             .maybeSingle();
 
         if (!data) {
-            const { data: newUser, error: insertError } = await supabase
+            const { data: newUser } = await supabase
                 .from('users')
                 .insert([
                     { 
@@ -55,7 +63,7 @@ async function syncUserWithDatabase(user) {
                     }
                 ])
                 .select()
-                .single();
+                .maybeSingle();
             
             data = newUser;
         }
@@ -72,7 +80,7 @@ async function syncUserWithDatabase(user) {
     }
 }
 
-// 3. Deposit Request Function (በማንኛውም አጋጣሚ Send የሚያደርግ)
+// 3. Deposit Request Function
 async function submitDeposit() {
     const transIdElem = document.getElementById('transId');
     const amountElem = document.getElementById('depositAmount');
@@ -85,11 +93,16 @@ async function submitDeposit() {
         return;
     }
 
+    if (!supabase) {
+        alert("ከዳታቤዝ ጋር መገናኘት አልተቻለም! እባክዎ ኢንተርኔትዎን ወይም የ Supabase ቁልፎችን ያረጋግጡ።");
+        return;
+    }
+
     try {
-        // መጀመሪያ ተጠቃሚው users ቴብል ውስጥ መኖሩን ማረጋገጥ
+        // ተጠቃሚው መኖሩን ማረጋገጥ
         await syncUserWithDatabase(currentUser);
 
-        // ቀጥሎ ትራንዛክሽኑን ማስገባት
+        // Deposit ጥያቄ መላክ
         const { data, error } = await supabase
             .from('transactions')
             .insert([
@@ -114,7 +127,7 @@ async function submitDeposit() {
     }
 }
 
-// Tab Switcher
+// 4. Tab Switcher Function (በማንኛውም ሁኔታ የሚሰራ)
 function switchTab(tabId, element) {
     const contents = document.querySelectorAll('.tab-content');
     contents.forEach(content => content.classList.remove('active'));
@@ -127,7 +140,7 @@ function switchTab(tabId, element) {
     if (element) element.classList.add('active');
 }
 
-// Bingo Room
+// 5. Bingo Room Functions
 function openBingoRoom(stake = "10 ETB", derash = 0) {
     document.getElementById('gameModal').style.display = 'block';
     document.getElementById('selectedStake').innerText = stake;
