@@ -36,11 +36,39 @@
             </div>
 
             <h3 class="section-title">ACTIVE GAMES</h3>
-            <div class="game-cards">
-                <div class="card active-game-card">
-                    <h4>BINGO</h4>
-                    <p>Play Now and Win!</p>
-                    <button class="btn btn-yellow" onclick="openBingoRoom()">Play Now</button>
+            
+            <!-- 4 Bingo Stake Rooms Grid -->
+            <div class="grid-2">
+                <div class="card stake-card">
+                    <div class="stake-title">መደብ 10 ETB</div>
+                    <span class="badge">BONUS</span>
+                    <div class="derash-info">ደራሽ - <span class="yellow-text">184 ETB</span></div>
+                    <div class="status-active">ACTIVE</div>
+                    <button class="btn btn-blue block" onclick="openBingoRoom('10 ETB', 184)">Join</button>
+                </div>
+
+                <div class="card stake-card">
+                    <div class="stake-title">መደብ 20 ETB</div>
+                    <span class="badge">BONUS</span>
+                    <div class="derash-info">ደራሽ - <span class="yellow-text">0 ETB</span></div>
+                    <div class="status-waiting">WAITING</div>
+                    <button class="btn btn-blue block" onclick="openBingoRoom('20 ETB', 0)">Join</button>
+                </div>
+
+                <div class="card stake-card">
+                    <div class="stake-title">መደብ 50 ETB</div>
+                    <span class="badge">BONUS</span>
+                    <div class="derash-info">ደራሽ - <span class="yellow-text">0 ETB</span></div>
+                    <div class="status-waiting">WAITING</div>
+                    <button class="btn btn-blue block" onclick="openBingoRoom('50 ETB', 0)">Join</button>
+                </div>
+
+                <div class="card stake-card">
+                    <div class="stake-title">መደብ 100 ETB</div>
+                    <span class="badge">BONUS</span>
+                    <div class="derash-info">ደራሽ - <span class="yellow-text">0 ETB</span></div>
+                    <div class="status-waiting">WAITING</div>
+                    <button class="btn btn-blue block" onclick="openBingoRoom('100 ETB', 0)">Join</button>
                 </div>
             </div>
 
@@ -65,12 +93,10 @@
                 <div class="pay-card">
                     <b>CBE</b>
                     <p>1000202926308</p>
-                    <p> ABDULFETA </p>
                 </div>
                 <div class="pay-card">
                     <b>Telebirr</b>
                     <p>0988818312</p>
-                    <p> ABDULFETA </p>
                 </div>
             </div>
             <div class="form-group">
@@ -110,29 +136,30 @@
                 <p>Balance: <b id="profileBalance">0.00 ETB</b></p>
             </div>
         </section>
-        <!-- Bingo Game Board Modal -->
-<div id="gameModal" class="game-modal" style="display: none;">
-    <div class="game-header">
-        <button class="back-btn" onclick="closeBingoRoom()">⬅</button>
-        <span id="selectedStake">10 ETB</span>
-        <span>Game ID: <b id="gameId">669</b></span>
-    </div>
-    
-    <div class="game-stats">
-        <div>Stake: <b id="stakeAmount">10 ETB</b></div>
-        <div>Derash: <b class="yellow-text" id="derashAmount">184 ETB</b></div>
-        <div>Status: <span class="green-text">Active</span></div>
-    </div>
-
-    <!-- 1-200 Bingo Numbers Board -->
-    <div class="bingo-grid" id="bingoGrid"></div>
-
-    <div class="overlay-message" id="overlayMessage">
-        <h3>ጨዋታው ተጀምሯል</h3>
-        <p>እባክዎ የሚቀጥለውን ዙር ይጠብቁ ወይም በሌላ መደብ ይጫወቱ።</p>
-    </div>
-</div>
     </main>
+
+    <!-- Bingo Game Board Modal -->
+    <div id="gameModal" class="game-modal" style="display: none;">
+        <div class="game-header">
+            <button class="back-btn" onclick="closeBingoRoom()">⬅</button>
+            <span id="selectedStake">10 ETB</span>
+            <span>Game ID: <b id="gameId">669</b></span>
+        </div>
+        
+        <div class="game-stats">
+            <div>Stake: <b id="stakeAmount">10 ETB</b></div>
+            <div>Derash: <b class="yellow-text" id="derashAmount">184 ETB</b></div>
+            <div>Status: <span class="green-text">Active</span></div>
+        </div>
+
+        <!-- 1-200 Bingo Numbers Board -->
+        <div class="bingo-grid" id="bingoGrid"></div>
+
+        <div class="overlay-message" id="overlayMessage">
+            <h3>ጨዋታው ተጀምሯል</h3>
+            <p>እባክዎ የሚቀጥለውን ዙር ይጠብቁ ወይም በሌላ መደብ ይጫወቱ።</p>
+        </div>
+    </div>
 
     <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
