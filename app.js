@@ -2,16 +2,15 @@
 const tg = window.Telegram ? window.Telegram.WebApp : null;
 
 if (tg) {
-    tg.expand(); // ሚኒ አፑ በሙሉ ስክሪን እንዲከፈት
-    // ከተጠቃሚው ቴሌግራም አካውንት መረጃዎችን መውሰድ
+    tg.expand();
     const user = tg.initDataUnsafe.user;
     if (user) {
-        document.getElementById('userName').innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+        document.getElementById('userName').innerHTML = `${user.first_name} <i class="fa-solid fa-gem vip-icon"></i>`;
         document.getElementById('userAvatar').innerText = user.first_name.charAt(0);
     }
 }
 
-// ገጾችን በመጫን መቀያየር (Tab Switching)
+// Tab Switcher
 function switchTab(tabId, element) {
     const contents = document.querySelectorAll('.tab-content');
     contents.forEach(content => content.classList.remove('active'));
@@ -20,35 +19,12 @@ function switchTab(tabId, element) {
     buttons.forEach(btn => btn.classList.remove('active'));
 
     document.getElementById(tabId).classList.add('active');
-    if(element) element.classList.add('active');
-}
-
-// ቢንጎ ክፍሉን መክፈቻ እና ከ 1 እስከ 200 ቁጥሮችን ሰሌዳው ላይ መፍጠሪያ
-function openBingoRoom(stake = "10 ETB") {
-    document.getElementById('gameModal').style.display = 'block';
-    document.getElementById('selectedStake').innerText = stake;
-    document.getElementById('stakeAmount').innerText = stake;
-
-    const grid = document.getElementById('bingoGrid');
-    grid.innerHTML = ''; // አሮጌውን ማጽጃ
-
-    // ከ 1 እስከ 200 ቁጥሮችን በራስ-ሰር ሰሌዳው ላይ መፍጠር
-    for (let i = 1; i <= 200; i++) {
-        const box = document.createElement('div');
-        box.className = 'number-box';
-        box.innerText = i;
-        
-        // ቁጥር ሲጫኑ መምረጫ/ማብሪያ እና ማጥፊያ
-        box.onclick = function() {
-            this.classList.toggle('selected');
-        };
-
-        grid.appendChild(box);
+    if (element) {
+        element.classList.add('active');
     }
 }
 
-// የቢንጎ ክፍሉን መዝጊያ
-// ቢንጎ ክፍሉን መክፈቻ እና ከ 1 እስከ 200 ቁጥሮችን ሰሌዳው ላይ መፍጠሪያ
+// Open Bingo Game Room with 200 Numbers
 function openBingoRoom(stake = "10 ETB", derash = 0) {
     document.getElementById('gameModal').style.display = 'block';
     document.getElementById('selectedStake').innerText = stake;
@@ -56,19 +32,22 @@ function openBingoRoom(stake = "10 ETB", derash = 0) {
     document.getElementById('derashAmount').innerText = derash + " ETB";
 
     const grid = document.getElementById('bingoGrid');
-    grid.innerHTML = ''; // አሮጌውን ማጽጃ
+    grid.innerHTML = '';
 
-    // ከ 1 እስከ 200 ቁጥሮችን በራስ-ሰር ሰሌዳው ላይ መፍጠር
     for (let i = 1; i <= 200; i++) {
         const box = document.createElement('div');
         box.className = 'number-box';
         box.innerText = i;
         
-        // ቁጥር ሲጫኑ መምረጫ
         box.onclick = function() {
             this.classList.toggle('selected');
         };
 
         grid.appendChild(box);
     }
+}
+
+// Close Bingo Modal
+function closeBingoRoom() {
+    document.getElementById('gameModal').style.display = 'none';
 }
