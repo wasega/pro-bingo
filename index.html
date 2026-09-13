@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Bot App</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="header">
+        <div class="user-info">
+            <div class="avatar" id="userAvatar">K</div>
+            <div>
+                <div class="username" id="userName">User</div>
+                <div class="phone" id="userPhone">+2519...</div>
+            </div>
+        </div>
+        <div class="wallet-box">
+            <span class="wallet-label">Wallet</span>
+            <span class="wallet-amount" id="userBalance">0.00 ETB</span>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="mainContent" class="content">
+        <!-- Games Section (Default) -->
+        <section id="gamesTab" class="tab-content active">
+            <div class="quick-actions">
+                <button class="btn btn-yellow" onclick="switchTab('depositTab')">Deposit</button>
+                <button class="btn btn-outline">Withdraw</button>
+                <button class="btn btn-outline">Invite</button>
+            </div>
+
+            <h3 class="section-title">ACTIVE GAMES</h3>
+            <div class="game-cards">
+                <div class="card active-game-card">
+                    <h4>BINGO</h4>
+                    <p>Play Now and Win!</p>
+                    <button class="btn btn-yellow" onclick="openBingoRoom()">Play Now</button>
+                </div>
+            </div>
+
+            <h3 class="section-title">FUTURE RELEASES</h3>
+            <div class="grid-2">
+                <div class="card coming-soon">
+                    <h4>Aviator</h4>
+                    <span>Coming Soon</span>
+                </div>
+                <div class="card coming-soon">
+                    <h4>Keno</h4>
+                    <span>Coming Soon</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Deposit Tab -->
+        <section id="depositTab" class="tab-content">
+            <h3>Deposit Funds</h3>
+            <p class="subtitle">የክፍያ ዘዴ ይምረጡ</p>
+            <div class="payment-methods">
+                <div class="pay-card">
+                    <b>CBE</b>
+                    <p>1000202926308</p>
+                </div>
+                <div class="pay-card">
+                    <b>Telebirr</b>
+                    <p>0988818312</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="text" placeholder="Paste SMS or Trans ID" id="transId">
+                <input type="number" placeholder="Amount" id="depositAmount">
+                <button class="btn btn-yellow block">ገቢ ጠይቅ</button>
+            </div>
+        </section>
+
+        <!-- Leaderboard Tab -->
+        <section id="leaderboardTab" class="tab-content">
+            <h3>Leaderboard</h3>
+            <div class="leader-item">
+                <span>1. Lij Mayk</span>
+                <span class="yellow-text">8659 Plays</span>
+            </div>
+            <div class="leader-item">
+                <span>2. Games pab</span>
+                <span class="yellow-text">6210 Plays</span>
+            </div>
+        </section>
+
+        <!-- Shamo Tab -->
+        <section id="shamoTab" class="tab-content">
+            <h3>Shamo Combo</h3>
+            <p>Enter your reward code</p>
+            <div class="form-group">
+                <input type="text" placeholder="Enter combo code here">
+                <button class="btn btn-yellow block">Claim Reward</button>
+            </div>
+        </section>
+
+        <!-- Profile Tab -->
+        <section id="profileTab" class="tab-content">
+            <h3>Profile</h3>
+            <div class="profile-card">
+                <p>Balance: <b id="profileBalance">0.00 ETB</b></p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" onclick="switchTab('gamesTab', this)">🎮<br>Games</button>
+        <button class="nav-btn" onclick="switchTab('depositTab', this)">💳<br>Deposit</button>
+        <button class="nav-btn" onclick="switchTab('leaderboardTab', this)">🏆<br>Leaderboard</button>
+        <button class="nav-btn" onclick="switchTab('shamoTab', this)">🎁<br>Shamo</button>
+        <button class="nav-btn" onclick="switchTab('profileTab', this)">👤<br>Profile</button>
+    </nav>
+
+    <script src="app.js"></script>
+</body>
+</html>
