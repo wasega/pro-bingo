@@ -228,61 +228,6 @@
 </button>
     </nav>
 
-    <!-- BINGO GAME MAIN CONTAINER -->
-<div id="bingoGameScreen" style="display:none; background:#121026; color:#fff; min-height:100vh; padding:10px;">
-    
-    <!-- TOP HEADER BAR -->
-    <div style="display:flex; justify-content:space-between; background:#1e1a3a; padding:8px; border-radius:8px; text-align:center; font-size:12px; font-weight:bold;">
-        <div>Game ID<br><span id="gameIdDisplay" style="color:#a855f7;">DBAP1Q6F</span></div>
-        <div>Players<br><span id="playersCount">0</span></div>
-        <div>Bet<br><span id="stakeDisplay">10</span></div>
-        <div>Derash<br><span id="derashDisplay" style="color:#eab308;">0</span></div>
-        <div>Called<br><span id="calledCount">0</span></div>
-    </div>
-
-    <!-- MAIN GAME BODY (LEFT: 75 BOARD, RIGHT: LIVE CALL) -->
-    <div style="display:flex; gap:10px; margin-top:10px;">
-        
-        <!-- LEFT: 1-75 BINGO BOARD -->
-        <div style="flex:1.2; background:#1e1a3a; border-radius:10px; padding:6px;">
-            <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:4px; text-align:center; font-weight:bold; margin-bottom:5px;">
-                <div style="background:#3b82f6; border-radius:4px;">B</div>
-                <div style="background:#a855f7; border-radius:4px;">I</div>
-                <div style="background:#ec4899; border-radius:4px;">N</div>
-                <div style="background:#22c55e; border-radius:4px;">G</div>
-                <div style="background:#f97316; border-radius:4px;">O</div>
-            </div>
-            <div id="board75Grid" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:3px; max-height:420px; overflow-y:auto;">
-                <!-- 1 እስከ 75 ቁጥሮች በ JS አውቶማቲክ ይፈጠራሉ -->
-            </div>
-        </div>
-
-        <!-- RIGHT: CALLING DISPLAY AREA -->
-        <div style="flex:1; display:flex; flex-direction:column; gap:10px;">
-            <!-- RECENT CALLED BALLS -->
-            <div id="recentBalls" style="display:flex; gap:4px; justify-content:center; min-height:30px;"></div>
-            
-            <!-- CURRENT CALLED BIG BALL -->
-            <div style="background:#1e1a3a; border-radius:12px; padding:20px; text-align:center;">
-                <div id="currentBallDisplay" style="width:70px; height:70px; border-radius:50%; background:#fff; color:#000; font-size:24px; font-weight:bold; display:flex; align-items:center; justify-content:center; margin:0 auto; border:4px solid #eab308;">
-                    --
-                </div>
-            </div>
-
-            <!-- STATUS BOX -->
-            <div style="background:#1e1a3a; border-radius:12px; padding:15px; text-align:center; flex:1;">
-                <h3 style="margin:0; font-size:16px;">WATCHING ONLY</h3>
-                <p style="font-size:11px; color:#aaa; margin-top:10px;">የዚህ ዙር ጨዋታ ተጀምሯል። አዲስ ዙር እስኪጀምር እዚህ ይጠብቁ።</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- BOTTOM ACTION BUTTONS -->
-    <div style="display:flex; gap:10px; margin-top:10px;">
-        <button onclick="leaveGame()" style="flex:1; background:#ef4444; color:#fff; padding:12px; border:none; border-radius:8px; font-weight:bold;">LEAVE</button>
-        <button onclick="refreshGame()" style="flex:1; background:#3b82f6; color:#fff; padding:12px; border:none; border-radius:8px; font-weight:bold;">REFRESH</button>
-    </div>
-</div>
 
     <!-- 1. Telegram WebApp -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
