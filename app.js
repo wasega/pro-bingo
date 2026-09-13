@@ -249,16 +249,43 @@ function refreshGame() {
 // ==========================================
 // 7. BINGO LIVE GAME ENGINE (አዲስ የሚጨመር)
 // ==========================================
+let currentUser = { id: 0, first_name: "Player" };
 let currentGameState = {
     gameId: "DBAP1Q6F",
     calledNumbers: [],
-    currentBall: null,
-    pot: 0,
-    players: 0,
-    stake: 10
+    currentBall: null
 };
 
-// 1-75 ቦርድ መፍጠሪያ
+// 1. TELEGRAM WEBAPP INIT
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            currentUser = tg.initDataUnsafe.user;
+        }
+    }
+    
+    const userNameElem = document.getElementById('userName');
+    if (userNameElem) userNameElem.innerText = currentUser.first_name;
+});
+
+// 2. TAB SWITCHER (FOR BOT AND TOUCH DEVICES)
+function switchTab(tabId, btnElement) {
+    const contents = document.querySelectorAll('.tab-content');
+    contents.forEach(content => content.classList.remove('active'));
+
+    const buttons = document.querySelectorAll('.nav-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+
+    const targetTab = document.getElementById(tabId);
+    if (targetTab) targetTab.classList.add('active');
+    if (btnElement) btnElement.classList.add('active');
+}
+
+// 3. 75 BOARD GENERATOR (NO AUTO SELECT)
 function render75Board() {
     const grid = document.getElementById('board75Grid');
     if (!grid) return;
@@ -267,69 +294,53 @@ function render75Board() {
     for (let i = 1; i <= 75; i++) {
         const cell = document.createElement('div');
         cell.id = `ball-${i}`;
+        cell.className = 'board-cell';
         cell.innerText = i;
-        cell.style.cssText = "background:#2a244d; border-radius:4px; padding:6px 0; font-size:11px; font-weight:bold; text-align:center; color:#aaa;";
         grid.appendChild(cell);
     }
 }
 
-// ቁጥር ሲወጣ ቦርዱ ላይ ማብራት
+// 4. OPEN GAME MODAL IN FULLSCREEN OVERLAY
+function openBingoRoom(gameId = "DBAP1Q6F", stake = 10) {
+    document.getElementById('gameIdDisplay').innerText = gameId;
+    document.getElementById('stakeDisplay').innerText = stake;
+    
+    // ቦርዱን ማዘጋጀት
+    render75Board();
+    
+    // ጌሙን ሙሉ ስክሪን ማድረግ
+    const gameScreen = document.getElementById('bingoGameScreen');
+    if (gameScreen) gameScreen.style.display = 'block';
+}
+
+// 5. MANUAL NUMBER CALLER (ለሙከራ ወይም ለሰርቨር ማዛመጃ)
 function callNextNumber(num) {
     if (!num || currentGameState.calledNumbers.includes(num)) return;
 
     currentGameState.calledNumbers.push(num);
     currentGameState.currentBall = num;
 
-    let letter = '';
-    if (num <= 15) letter = 'B';
-    else if (num <= 30) letter = 'I';
-    else if (num <= 45) letter = 'N';
-    else if (num <= 60) letter = 'G';
-    else letter = 'O';
+    let letter = 'B';
+    if (num > 15 && num <= 30) letter = 'I';
+    else if (num > 30 && num <= 45) letter = 'N';
+    else if (num > 45 && num <= 60) letter = 'G';
+    else if (num > 60) letter = 'O';
 
-    const formattedBall = `${letter}-${num}`;
+    const ballDisplay = document.getElementById('currentBallDisplay');
+    if (ballDisplay) ballDisplay.innerText = `${letter}-${num}`;
 
-    // Big Ball ማሳየት
-    const ballElem = document.getElementById('currentBallDisplay');
-    if (ballElem) ballElem.innerText = formattedBall;
-
-    // ቦርድ ላይ ቀለሙን መቀየር
     const cell = document.getElementById(`ball-${num}`);
-    if (cell) {
-        cell.style.background = "#10b981"; // አረንጓዴ ቀለም
-        cell.style.color = "#fff";
-    }
+    if (cell) cell.classList.add('called');
 
-    // ቆጣሪ ማስተካከል
     const countElem = document.getElementById('calledCount');
     if (countElem) countElem.innerText = currentGameState.calledNumbers.length;
 }
 
-// ጨዋታውን መጀመር እና 75 ቦርድ ማዘጋጀት (Modal ክፍት ሲሆን የሚጠራ)
-function startBingoGameView() {
-    const gameScreen = document.getElementById('bingoGameScreen');
-    if (gameScreen) gameScreen.style.display = 'block';
-
-    render75Board();
-
-    // በየ 3 ሰከንዱ ቁጥር እንዲወጣ መሞከሪያ
-    const interval = setInterval(() => {
-        if (currentGameState.calledNumbers.length >= 75) {
-            clearInterval(interval);
-            return;
-        }
-        let randomNum = Math.floor(Math.random() * 75) + 1;
-        while(currentGameState.calledNumbers.includes(randomNum)) {
-            randomNum = Math.floor(Math.random() * 75) + 1;
-        }
-        callNextNumber(randomNum);
-    }, 3000);
-}
-
-// ክፍሉን መዝጊያ
+// 6. LEAVE & REFRESH
 function leaveGame() {
     const gameScreen = document.getElementById('bingoGameScreen');
     if (gameScreen) gameScreen.style.display = 'none';
+    currentGameState.calledNumbers = [];
 }
 
 function refreshGame() {
