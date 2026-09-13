@@ -29,31 +29,45 @@ async function supabaseFetch(endpoint, options = {}) {
 }
 
 // ==========================================
-// 2. Telegram WebApp Setup (የተስተካከለ)
+// 2. Telegram WebApp Only Setup (የተስተካከለ)
 // ==========================================
-const tg = window.Telegram ? window.Telegram.WebApp : null;
-let currentUser = { id: 12345678, first_name: "Test User", username: "testuser" };
+let currentUser = null; // የ Test User መረጃ ሙሉ በሙሉ ተወግዷል
 
 function initTelegramUser() {
-    if (tg) {
-        tg.ready();  // ቴሌግራም ዝግጁ መሆኑን ማረጋገጫ
+    if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        
+        tg.ready();  // ቴሌግራም ዝግጁ መሆኑን ማረጋገጥ
         tg.expand(); // አፑን ሙሉ ስክሪን ማድረግ
 
+        // ከቴሌግራም የእውነተኛ ተጠቃሚ መረጃ ማውጣት
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             currentUser = tg.initDataUnsafe.user;
-            console.log("Real Telegram User Loaded:", currentUser);
-        } else {
-            console.warn("Telegram user data not found, using test user.");
+            console.log("Real Telegram User Successfully Loaded:", currentUser);
+            return true;
         }
     }
+    return false;
 }
 
 // ገጹ ሲከፈት (Page Load)
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. መጀመሪያ የቴሌግራም ተጠቃሚ መረጃን ማውጣት
-    initTelegramUser();
+    // 1. የቴሌግራም ተጠቃሚ መኖሩን ማረጋገጥ
+    const isTelegram = initTelegramUser();
 
-    // 2. በስክሪኑ ላይ የይዘት ስሞችን ማሳየት
+    // ቴሌግራም ካልሆነ አፑን እንዳይሰራ ማድረግ
+    if (!isTelegram || !currentUser) {
+        document.body.innerHTML = `
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#121026; color:#fff; text-align:center; padding:20px; font-family:sans-serif;">
+                <h2 style="color:#ef4444;">⚠️ መግባት አልተቻለም!</h2>
+                <p>ይህ አፕሊኬሽን የሚሰራው በ <strong>Telegram Bot</strong> በኩል ሲከፈት ብቻ ነው።</p>
+                <p style="font-size:12px; color:#aaa; margin-top:10px;">እባክዎን አፑን ዘግተው በቴሌግራም ቦትዎ በኩል ይክፈቱት።</p>
+            </div>
+        `;
+        return;
+    }
+
+    // 2. በስክሪኑ ላይ የእውነተኛ ተጠቃሚ ስምና ፕሮፋይል ማሳየት
     const userNameElem = document.getElementById('userName');
     const userAvatarElem = document.getElementById('userAvatar');
     
