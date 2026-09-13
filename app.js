@@ -23,7 +23,7 @@ function switchTab(tabId, element) {
     if(element) element.classList.add('active');
 }
 
-// ቢንጎ ክፍሉን መክፈቻ እና 100 ቁጥሮችን ሰሌዳው ላይ መፍጠሪያ
+// ቢንጎ ክፍሉን መክፈቻ እና ከ 1 እስከ 200 ቁጥሮችን ሰሌዳው ላይ መፍጠሪያ
 function openBingoRoom(stake = "10 ETB") {
     document.getElementById('gameModal').style.display = 'block';
     document.getElementById('selectedStake').innerText = stake;
@@ -32,13 +32,13 @@ function openBingoRoom(stake = "10 ETB") {
     const grid = document.getElementById('bingoGrid');
     grid.innerHTML = ''; // አሮጌውን ማጽጃ
 
-    // ከ 1 እስከ 100 ቁጥሮችን በራስ-ሰር ሰሌዳው ላይ መፍጠር
-    for (let i = 1; i <= 100; i++) {
+    // ከ 1 እስከ 200 ቁጥሮችን በራስ-ሰር ሰሌዳው ላይ መፍጠር
+    for (let i = 1; i <= 200; i++) {
         const box = document.createElement('div');
         box.className = 'number-box';
         box.innerText = i;
         
-        // ቁጥር ሲጫኑ መምረጫ
+        // ቁጥር ሲጫኑ መምረጫ/ማብሪያ እና ማጥፊያ
         box.onclick = function() {
             this.classList.toggle('selected');
         };
