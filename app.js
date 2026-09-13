@@ -2,7 +2,7 @@
 // 1. Database Configuration (Direct REST API)
 // ==========================================
 const SUPABASE_URL = "https://eritlinwsctlbmqhbyju.supabase.co"; // መጨረሻ ላይ / እንዳይኖር!
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyaXRsaW53c2N0bGJtcWhieWp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTM5OTYsImV4cCI6MjEwNDg4OTk5Nn0.lLfbYZBEe6T0qry3xFJiWQGUxydd79LzfrMe8tc2ieo";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyaXRsaW53c2N0bGJtcWhieWp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTM5OTYsImV4cCI6MjEwNDg4OTk5Nn0.lLfbYZBEe6T0qry3xFJiWQGUxydd79LzfrMe8tc2ieo"; // የእርስዎን ANON KEY እዚህ ይተኩ
 
 // Direct HTTP Request Helper (Safe API Call)
 async function supabaseFetch(endpoint, options = {}) {
@@ -29,32 +29,38 @@ async function supabaseFetch(endpoint, options = {}) {
 }
 
 // ==========================================
-// 2. Telegram WebApp Setup
+// 2. Telegram WebApp Setup (የተስተካከለ)
 // ==========================================
+const tg = window.Telegram ? window.Telegram.WebApp : null;
 let currentUser = { id: 12345678, first_name: "Test User", username: "testuser" };
 
-try {
-    if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.ready();
-        window.Telegram.WebApp.expand();
-        if (window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
-            currentUser = window.Telegram.WebApp.initDataUnsafe.user;
+function initTelegramUser() {
+    if (tg) {
+        tg.ready();  // ቴሌግራም ዝግጁ መሆኑን ማረጋገጫ
+        tg.expand(); // አፑን ሙሉ ስክሪን ማድረግ
+
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            currentUser = tg.initDataUnsafe.user;
+            console.log("Real Telegram User Loaded:", currentUser);
+        } else {
+            console.warn("Telegram user data not found, using test user.");
         }
     }
-} catch (e) {
-    console.error("Telegram Setup Error:", e);
 }
 
 // ገጹ ሲከፈት (Page Load)
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("App ready!");
-    
+    // 1. መጀመሪያ የቴሌግራም ተጠቃሚ መረጃን ማውጣት
+    initTelegramUser();
+
+    // 2. በስክሪኑ ላይ የይዘት ስሞችን ማሳየት
     const userNameElem = document.getElementById('userName');
     const userAvatarElem = document.getElementById('userAvatar');
     
     if (userNameElem) userNameElem.innerHTML = `${currentUser.first_name} <i class="fa-solid fa-gem vip-icon"></i>`;
     if (userAvatarElem) userAvatarElem.innerText = currentUser.first_name ? currentUser.first_name.charAt(0) : 'U';
 
+    // 3. ከዳታቤዝ ጋር ማያያዝ
     await syncUserWithDatabase(currentUser);
 });
 
