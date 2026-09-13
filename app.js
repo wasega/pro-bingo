@@ -1,34 +1,35 @@
 // ==========================================
-// 1. Supabase Safe Client Initialization
+// 1. Database Configuration (Direct REST API)
 // ==========================================
-const SUPABASE_URL = "https://eritlinwsctlbmqhbyju.supabase.co"; // የእርስዎን URL እዚህ ይተኩ (መጨረሻ ላይ / እንዳይኖር!)
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyaXRsaW53c2N0bGJtcWhieWp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTM5OTYsImV4cCI6MjEwNDg4OTk5Nn0.lLfbYZBEe6T0qry3xFJiWQGUxydd79LzfrMe8tc2ieo";              // የእርስዎን ANON KEY እዚህ ይተኩ
+const SUPABASE_URL = "https://eritlinwsctlbmqhbyju.supabase.co"; // መጨረሻ ላይ / እንዳይኖር!
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyaXRsaW53c2N0bGJtcWhieWp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTM5OTYsImV4cCI6MjEwNDg4OTk5Nn0.lLfbYZBEe6T0qry3xFJiWQGUxydd79LzfrMe8tc2ieo";
 
-let supabaseClient = null;
-
-// CDN ሙሉ በሙሉ ተጭኖ እስኪያልቅ ጠብቆ Supabase ን የሚፈጥር ፈንክሽን
-function getSupabase() {
-    if (supabaseClient) return supabaseClient;
+// Direct HTTP Request Helper (Safe API Call)
+async function supabaseFetch(endpoint, options = {}) {
+    const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
+    const headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=representation",
+        ...options.headers
+    };
 
     try {
-        // CDN በ ተለያዩ ስሞች ሊጭነው ስለሚችል ሁሉንም አማራጭ መፈተሽ
-        const supabaseLib = window.supabase || window.Supabase;
-
-        if (supabaseLib && typeof supabaseLib.createClient === 'function') {
-            supabaseClient = supabaseLib.createClient(SUPABASE_URL, SUPABASE_KEY);
-            console.log("Supabase Client successfully initialized!");
-        } else {
-            console.warn("Supabase library is not loaded yet.");
+        const response = await fetch(url, { ...options, headers });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Error ${response.status}: ${errorText}`);
         }
+        return await response.json();
     } catch (err) {
-        console.error("Supabase init error:", err);
+        console.error("Supabase API Request Error:", err);
+        throw err;
     }
-
-    return supabaseClient;
 }
 
 // ==========================================
-// 2. Telegram WebApp User Setup
+// 2. Telegram WebApp Setup
 // ==========================================
 let currentUser = { id: 12345678, first_name: "Test User", username: "testuser" };
 
@@ -41,61 +42,66 @@ try {
         }
     }
 } catch (e) {
-    console.error("Telegram WebApp Error:", e);
+    console.error("Telegram Setup Error:", e);
 }
 
-// ==========================================
-// 3. Page Load Event
-// ==========================================
-document.addEventListener('DOMContentLoaded', () => {
+// ገጹ ሲከፈት (Page Load)
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log("App ready!");
+    
     const userNameElem = document.getElementById('userName');
     const userAvatarElem = document.getElementById('userAvatar');
     
     if (userNameElem) userNameElem.innerHTML = `${currentUser.first_name} <i class="fa-solid fa-gem vip-icon"></i>`;
     if (userAvatarElem) userAvatarElem.innerText = currentUser.first_name ? currentUser.first_name.charAt(0) : 'U';
 
-    // ከ 500ms በኋላ ዳታቤዝ ለመገናኘት መሞከር (CDN እስኪዘጋጅ)
-    setTimeout(() => {
-        syncUserWithDatabase(currentUser);
-    }, 500);
+    await syncUserWithDatabase(currentUser);
 });
 
 // ==========================================
-// 4. Database User Sync
+// 3. Database Sync Function
 // ==========================================
 async function syncUserWithDatabase(user) {
-    const db = getSupabase();
-    if (!db) return;
+    if (!SUPABASE_URL || SUPABASE_URL.includes("YOUR_PROJECT_ID")) {
+        console.warn("Supabase credentials have not been configured yet.");
+        return;
+    }
 
     try {
-        let { data, error } = await db.from('users').select('*').eq('telegram_id', user.id).maybeSingle();
+        // 1. ተጠቃሚው መኖሩን መፈለግ
+        const existingUsers = await supabaseFetch(`users?telegram_id=eq.${user.id}`);
+        let userData = existingUsers && existingUsers.length > 0 ? existingUsers[0] : null;
 
-        if (error) {
-            console.error("User fetch error:", error);
-            return;
+        // 2. ከሌለ አዲስ ማስገባት
+        if (!userData) {
+            const newUsers = await supabaseFetch('users', {
+                method: 'POST',
+                body: JSON.stringify({
+                    telegram_id: user.id,
+                    first_name: user.first_name,
+                    username: user.username || ''
+                })
+            });
+            if (newUsers && newUsers.length > 0) {
+                userData = newUsers[0];
+            }
         }
 
-        if (!data) {
-            const { data: newUser } = await db.from('users').insert([
-                { telegram_id: user.id, first_name: user.first_name, username: user.username || '' }
-            ]).select().maybeSingle();
-            data = newUser;
-        }
-
-        if (data) {
-            const formattedBalance = parseFloat(data.balance || 0).toFixed(2) + " ETB";
+        // 3. የሒሳብ መጠን (Balance) ማሳየት
+        if (userData) {
+            const formattedBalance = parseFloat(userData.balance || 0).toFixed(2) + " ETB";
             const userBal = document.getElementById('userBalance');
             const profBal = document.getElementById('profileBalance');
             if (userBal) userBal.innerText = formattedBalance;
             if (profBal) profBal.innerText = formattedBalance;
         }
     } catch (err) {
-        console.error("Sync Catch Error:", err);
+        console.error("Sync user failed:", err);
     }
 }
 
 // ==========================================
-// 5. Deposit Submission Function (የገቢ ጥያቄ)
+// 4. Submit Deposit (የገቢ ጥያቄ መላኪያ)
 // ==========================================
 async function submitDeposit() {
     const transIdElem = document.getElementById('transId');
@@ -109,41 +115,41 @@ async function submitDeposit() {
         return;
     }
 
-    const db = getSupabase();
-    if (!db) {
-        alert("ከዳታቤዝ ጋር መገናኘት አልተቻለም! እባክዎ የ Supabase URL እና KEY ማስተካከላቸውን ያረጋግጡ።");
+    if (!SUPABASE_URL || SUPABASE_URL.includes("YOUR_PROJECT_ID")) {
+        alert("እባክዎ በ app.js ላይ የ Supabase URL እና Key በትክክል ያስገቡ!");
         return;
     }
 
     try {
-        const { data, error } = await db.from('transactions').insert([
-            {
+        await syncUserWithDatabase(currentUser);
+
+        // የትራንዛክሽን ጥያቄ ወደ ዳታቤዝ መላክ
+        await supabaseFetch('transactions', {
+            method: 'POST',
+            body: JSON.stringify({
                 telegram_id: currentUser.id,
                 amount: amount,
                 trans_id: transId,
                 type: 'deposit',
                 status: 'pending'
-            }
-        ]);
+            })
+        });
 
-        if (error) {
-            if (error.code === '23505') {
-                alert("ይህ የትራንዛክሽን ቁጥር ቀደም ብሎ ገብቷል!");
-            } else {
-                alert("ስህተት፦ " + error.message);
-            }
-        } else {
-            alert("ጥያቄዎ በትክክል ተልኳል! አድሚኑ ያረጋግጥልዎታል።");
-            if (transIdElem) transIdElem.value = '';
-            if (amountElem) amountElem.value = '';
-        }
+        alert("ጥያቄዎ በትክክል ተልኳል! አድሚኑ ያረጋግጥልዎታል።");
+        if (transIdElem) transIdElem.value = '';
+        if (amountElem) amountElem.value = '';
+
     } catch (err) {
-        alert("ያልተጠበቀ ስህተት፦ " + err.message);
+        if (err.message && err.message.includes('409')) {
+            alert("ይህ የትራንዛክሽን ቁጥር ቀደም ብሎ ገብቷል!");
+        } else {
+            alert("ጥያቄውን መላክ አልተቻለም፦ " + err.message);
+        }
     }
 }
 
 // ==========================================
-// 6. Navigation Tabs Switcher
+// 5. Navigation Tab Switcher (የታችኛው ማውጫ)
 // ==========================================
 function switchTab(tabId, element) {
     const contents = document.querySelectorAll('.tab-content');
@@ -167,7 +173,7 @@ function switchTab(tabId, element) {
 }
 
 // ==========================================
-// 7. Bingo Modal Functions
+// 6. Bingo Room Functions
 // ==========================================
 function openBingoRoom(stake = "10 ETB", derash = 0) {
     const modal = document.getElementById('gameModal');
