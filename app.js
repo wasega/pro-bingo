@@ -2,7 +2,7 @@
 // 1. Supabase Initialization
 // ==========================================
 const SUPABASE_URL = "https://eritlinwsctlbmqhbyju.supabase.co"; // የእርስዎን URL እዚህ ይተኩ (መጨረሻ ላይ / እንዳይኖር)
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyaXRsaW53c2N0bGJtcWhieWp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTM5OTYsImV4cCI6MjEwNDg4OTk5Nn0.lLfbYZBEe6T0qry3xFJiWQGUxydd79LzfrMe8tc2ieo";              // የእርስዎን ANON KEY እዚህ ይተኩ
+const SUPABASE_KEY = "sb_publishable_F2Aag9L-D-5QTw4cw5AXNw_MRvtvxT8";              // የእርስዎን ANON KEY እዚህ ይተኩ
 
 let supabase = null;
 try {
