@@ -141,12 +141,20 @@
                     <b>Telebirr</b>
                     <p>0988818312</p>
                 </div>
-            </div>
-            <div class="form-group">
-                <input type="text" placeholder="Paste SMS or Trans ID" id="transId">
-                <input type="number" placeholder="Amount" id="depositAmount">
-                <button class="btn btn-yellow block pulse-btn">ገቢ ጠይቅ</button>
-            </div>
+            <!-- Deposit Form ክፍል -->
+<form onsubmit="event.preventDefault(); submitDeposit();">
+    <div class="input-group">
+        <label>የብር መጠን (ETB)</label>
+        <input type="number" id="depositAmount" placeholder="ለምሳሌ 100" required>
+    </div>
+    
+    <div class="input-group">
+        <label>የትራንዛክሽን ቁጥር (Transaction ID)</label>
+        <input type="text" id="transId" placeholder="ለምሳሌ TXN12345678" required>
+    </div>
+
+    <button type="button" class="btn btn-yellow block pulse-btn" onclick="submitDeposit()">ገቢ ጠይቅ</button>
+</form>
         </section>
 
         <!-- Leaderboard Tab -->
