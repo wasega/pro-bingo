@@ -32,8 +32,8 @@ function openBingoRoom(stake = "10 ETB") {
     const grid = document.getElementById('bingoGrid');
     grid.innerHTML = ''; // አሮጌውን ማጽጃ
 
-    // ከ 1 እስከ 200 ቁጥሮችን በራስ-ሰር ሰሌዳው ላይ መፍጠር
-    for (let i = 1; i <= 200; i++) {
+    // ከ 1 እስከ 100 ቁጥሮችን በራስ-ሰር ሰሌዳው ላይ መፍጠር
+    for (let i = 1; i <= 100; i++) {
         const box = document.createElement('div');
         box.className = 'number-box';
         box.innerText = i;
@@ -50,4 +50,4 @@ function openBingoRoom(stake = "10 ETB") {
 // የቢንጎ ክፍሉን መዝጊያ
 function closeBingoRoom() {
     document.getElementById('gameModal').style.display = 'none';
-}) {
+}
