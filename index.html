@@ -2,253 +2,145 @@
 <html lang="am">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Bingo Bot</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Telegram Web App SDK -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pro Bingo</title>
+    <!-- 1. Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        body { background: #121026; color: #fff; font-family: sans-serif; overflow-x: hidden; }
+
+        .tab-content { display: none; padding: 15px; padding-bottom: 70px; }
+        .tab-content.active { display: block; }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #1e1a3a;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 999;
+            border-top: 1px solid #2d2654;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: #8b85b1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 11px;
+            cursor: pointer;
+            width: 20%;
+        }
+
+        .nav-btn.active { color: #a855f7; font-weight: bold; }
+        .nav-btn i { font-size: 18px; margin-bottom: 3px; }
+
+        /* FULL SCREEN OVERLAY BINGO GAME MODAL */
+        #bingoGameScreen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #121026;
+            z-index: 99999; /* ሙሉ በሙሉ ከላይ እንዲሸፍን */
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            max-height: calc(100vh - 160px);
+            overflow-y: auto;
+        }
+
+        .board-cell {
+            background: #2a244d;
+            border-radius: 4px;
+            padding: 8px 0;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .board-cell.called {
+            background: #10b981 !important;
+            color: #fff !important;
+        }
+
+        .btn-action {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+            flex: 1;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Top Header -->
-    <header class="header">
-        <div class="user-info">
-            <div class="avatar-glow">
-                <div class="avatar" id="userAvatar">K</div>
-            </div>
-            <div class="user-details">
-                <span class="username" id="userName">Kk <i class="fa-solid fa-gem vip-icon"></i></span>
-                <span class="gift-box"><i class="fa-solid fa-gift"></i> 0 ETB</span>
-            </div>
-        </div>
-        <div class="wallet-box">
-            <span class="wallet-label">Wallet</span>
-            <span class="wallet-amount" id="userBalance">0.00 ETB</span>
-        </div>
-    </header>
-
-    <!-- Navigation Line Bar -->
-    <div class="top-bar-divider"></div>
-
-    <!-- Main Content Container -->
-    <main id="mainContent" class="content">
-        <!-- Games Section -->
-        <section id="gamesTab" class="tab-content active">
-            
-            <!-- Quick Action Buttons -->
-            <div class="quick-actions">
-                <button class="btn btn-yellow pulse-btn" onclick="switchTab('depositTab')">Deposit</button>
-                <button class="btn btn-outline" onclick="switchTab('withdrawTab')">Withdraw</button>
-                <button class="btn btn-outline" onclick="switchTab('inviteTab')">Invite</button>
-            </div>
-
-            <!-- Active Bingo Cards Grid -->
-            <div class="grid-2">
-                <!-- 10 ETB Card -->
-                <div class="card stake-card glow-card">
-                    <div class="card-header-row">
-                        <i class="fa-solid fa-coins coin-icon"></i>
-                        <span class="stake-title">መደብ 10 ETB</span>
-                    </div>
-                    <div class="badge-neon"><i class="fa-regular fa-star"></i> BONUS</div>
-                    <div class="derash-text"><i class="fa-solid fa-trophy trophy-icon"></i> ደራሽ - <span class="cyan-text">112 ETB</span></div>
-                    <div class="status-indicator active-pulse"><i class="fa-solid fa-wave-square"></i> ACTIVE</div>
-                    <button class="btn btn-blue glow-btn block" onclick="openBingoRoom('10 ETB', 112)">
-                        <i class="fa-solid fa-paper-plane"></i> Join
-                    </button>
-                </div>
-
-                <!-- 20 ETB Card -->
-                <div class="card stake-card glow-card">
-                    <div class="card-header-row">
-                        <i class="fa-solid fa-coins coin-icon"></i>
-                        <span class="stake-title">መደብ 20 ETB</span>
-                    </div>
-                    <div class="badge-neon"><i class="fa-regular fa-star"></i> BONUS</div>
-                    <div class="derash-text"><i class="fa-solid fa-trophy trophy-icon"></i> ደራሽ - <span class="cyan-text">20 ETB</span></div>
-                    <div class="status-indicator waiting-pulse"><i class="fa-solid fa-wave-square"></i> WAITING</div>
-                    <button class="btn btn-blue glow-btn block" onclick="openBingoRoom('20 ETB', 20)">
-                        <i class="fa-solid fa-paper-plane"></i> Join
-                    </button>
-                </div>
-
-                <!-- 50 ETB Card -->
-                <div class="card stake-card glow-card">
-                    <div class="card-header-row">
-                        <i class="fa-solid fa-coins coin-icon"></i>
-                        <span class="stake-title">መደብ 50 ETB</span>
-                    </div>
-                    <div class="badge-neon"><i class="fa-regular fa-star"></i> BONUS</div>
-                    <div class="derash-text"><i class="fa-solid fa-trophy trophy-icon"></i> ደራሽ - <span class="cyan-text">0 ETB</span></div>
-                    <div class="status-indicator waiting-pulse"><i class="fa-solid fa-wave-square"></i> WAITING</div>
-                    <button class="btn btn-blue glow-btn block" onclick="openBingoRoom('50 ETB', 0)">
-                        <i class="fa-solid fa-paper-plane"></i> Join
-                    </button>
-                </div>
-
-                <!-- 100 ETB Card -->
-                <div class="card stake-card glow-card">
-                    <div class="card-header-row">
-                        <i class="fa-solid fa-coins coin-icon"></i>
-                        <span class="stake-title">መደብ 100 ETB</span>
-                    </div>
-                    <div class="badge-neon"><i class="fa-regular fa-star"></i> BONUS</div>
-                    <div class="derash-text"><i class="fa-solid fa-trophy trophy-icon"></i> ደራሽ - <span class="cyan-text">0 ETB</span></div>
-                    <div class="status-indicator waiting-pulse"><i class="fa-solid fa-wave-square"></i> WAITING</div>
-                    <button class="btn btn-blue glow-btn block" onclick="openBingoRoom('100 ETB', 0)">
-                        <i class="fa-solid fa-paper-plane"></i> Join
-                    </button>
-                </div>
-            </div>
-
-            <!-- Banner Motion Slider -->
-            <div class="slider-container">
-                <div class="slider-wrapper" id="sliderWrapper">
-                    <div class="slide slide-1">
-                        <div class="banner-content">
-                            <h2>40</h2>
-                            <p>በቀጣዩ ዙር ይሳተፉና ያሸንፉ!</p>
-                        </div>
-                    </div>
-                    <div class="slide slide-2">
-                        <div class="banner-content">
-                            <h2>BINGO</h2>
-                            <p>100% ፈጣን ክፍያ በቴሌብር</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="slider-dots">
-                    <span class="dot active"></span>
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                </div>
-            </div>
-
-        </section>
-
-        <!-- Deposit Tab -->
-        <section id="depositTab" class="tab-content">
-            <h3>Deposit Funds</h3>
-            <p class="subtitle">የክፍያ ዘዴ ይምረጡ</p>
-            <div class="payment-methods">
-                <div class="pay-card glow-card">
-                    <b>CBE Bank</b>
-                    <p>1000202926308</p>
-                </div>
-                <div class="pay-card glow-card">
-                    <b>Telebirr</b>
-                    <p>0988818312</p>
-                </div>
-            <!-- Deposit Form ክፍል -->
-<form onsubmit="event.preventDefault(); submitDeposit();">
-    <div class="input-group">
-        <label>የብር መጠን (ETB)</label>
-        <input type="number" id="depositAmount" placeholder="ለምሳሌ 100" required>
-    </div>
-    
-    <div class="input-group">
-        <label>የትራንዛክሽን ቁጥር (Transaction ID)</label>
-        <input type="text" id="transId" placeholder="ለምሳሌ TXN12345678" required>
+    <!-- Tab 1: Home / Game Rooms -->
+    <div id="game" class="tab-content active">
+        <h2>Bingo Rooms</h2>
+        <br>
+        <button onclick="openBingoRoom('DBAP1Q6F', 10)" style="width: 100%; padding: 15px; background: #a855f7; border: none; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
+            JOIN ROOM (10 ETB)
+        </button>
     </div>
 
-    <button type="button" class="btn btn-yellow block pulse-btn" onclick="submitDeposit()">ገቢ ጠይቅ</button>
-</form>
-        </section>
-
-        <!-- Leaderboard Tab -->
-        <section id="leaderboardTab" class="tab-content">
-            <h3>Leaderboard</h3>
-            <div class="leader-item glow-card">
-                <span>1. Lij Mayk</span>
-                <span class="yellow-text">8659 Plays</span>
-            </div>
-            <div class="leader-item glow-card">
-                <span>2. Games pab</span>
-                <span class="yellow-text">6210 Plays</span>
-            </div>
-        </section>
-
-        <!-- Shamo Tab -->
-        <section id="shamoTab" class="tab-content">
-            <h3>Shamo Combo</h3>
-            <p>Enter your reward code</p>
-            <div class="form-group">
-                <input type="text" placeholder="Enter combo code here">
-                <button class="btn btn-yellow block pulse-btn">Claim Reward</button>
-            </div>
-        </section>
-
-        <!-- Profile Tab -->
-        <section id="profileTab" class="tab-content">
-            <h3>Profile</h3>
-            <div class="profile-card glow-card">
-                <p>Balance: <b id="profileBalance">0.00 ETB</b></p>
-            </div>
-        </section>
-    </main>
-
-    <!-- Bingo Game Board Modal -->
-    <div id="gameModal" class="game-modal" style="display: none;">
-        <div class="game-header">
-            <button class="back-btn" onclick="closeBingoRoom()"><i class="fa-solid fa-arrow-left"></i></button>
-            <span id="selectedStake" class="stake-header">10 ETB</span>
-            <span>Game ID: <b id="gameId" class="yellow-text">669</b></span>
-        </div>
-        
-        <div class="game-stats glow-card">
-            <div>Stake: <b id="stakeAmount">10 ETB</b></div>
-            <div>Derash: <b class="cyan-text" id="derashAmount">112 ETB</b></div>
-            <div>Status: <span class="green-text">Active</span></div>
-        </div>
-
-        <!-- 1-200 Bingo Numbers Board -->
-        <div class="bingo-grid" id="bingoGrid"></div>
-
-        <div class="overlay-message" id="overlayMessage">
-            <h3>ጨዋታው ተጀምሯል</h3>
-            <p>እባክዎ የሚቀጥለውን ዙር ይጠብቁ ወይም በሌላ መደብ ይጫወቱ።</p>
-        </div>
+    <!-- Tab 2: Wallet -->
+    <div id="wallet" class="tab-content">
+        <h2>Wallet</h2>
+        <p>Balance: <span id="userBalance">0.00 ETB</span></p>
     </div>
 
-    <!-- Bottom Navigation Bar -->
-    <nav class="bottom-nav">
-        <button class="nav-btn active" onclick="switchTab('gamesTab', this)">
-    <i class="fa-solid fa-gamepad"></i>
-    <span>Games</span>
-</button>
-<button class="nav-btn" onclick="switchTab('depositTab', this)">
-    <i class="fa-solid fa-wallet"></i>
-    <span>Deposit</span>
-</button>
-<button class="nav-btn" onclick="switchTab('profileTab', this)">
-    <i class="fa-solid fa-user"></i>
-    <span>Profile</span>
-</button>
-    </nav>
+    <!-- Tab 3: History -->
+    <div id="history" class="tab-content">
+        <h2>History</h2>
+    </div>
 
+    <!-- Tab 4: Scores -->
+    <div id="scores" class="tab-content">
+        <h2>Leaderboard</h2>
+    </div>
 
-    <!-- ከዚህ በላይ ያሉ የአፑ ዋና HTML ክፍሎች አሉ ... -->
+    <!-- Tab 5: Profile -->
+    <div id="profile" class="tab-content">
+        <h2>Profile</h2>
+        <p id="userName">User</p>
+    </div>
 
-    <!-- ========================================== -->
-    <!-- BINGO GAME MAIN CONTAINER (አዲስ የሚጨመር) -->
-    <!-- ========================================== -->
-    <div id="bingoGameScreen" style="display:none; background:#121026; color:#fff; min-height:100vh; padding:10px;">
-        
-        <!-- TOP HEADER BAR -->
-        <div style="display:flex; justify-content:space-between; background:#1e1a3a; padding:8px; border-radius:8px; text-align:center; font-size:12px; font-weight:bold;">
-            <div>Game ID<br><span id="gameIdDisplay" style="color:#a855f7;">DBAP1Q6F</span></div>
+    <!-- FULL SCREEN BINGO MODAL (Screen OVERLAY) -->
+    <div id="bingoGameScreen">
+        <!-- TOP HEADER -->
+        <div style="display:flex; justify-content:space-between; background:#1e1a3a; padding:10px; border-radius:8px; text-align:center; font-size:11px; font-weight:bold;">
+            <div>Game ID<br><span id="gameIdDisplay" style="color:#a855f7;">-</span></div>
             <div>Players<br><span id="playersCount">0</span></div>
             <div>Bet<br><span id="stakeDisplay">10</span></div>
             <div>Derash<br><span id="derashDisplay" style="color:#eab308;">0</span></div>
             <div>Called<br><span id="calledCount">0</span></div>
         </div>
 
-        <!-- MAIN GAME BODY (LEFT: 75 BOARD, RIGHT: LIVE CALL) -->
+        <!-- MAIN LAYOUT -->
         <div style="display:flex; gap:10px; margin-top:10px;">
-            
-            <!-- LEFT: 1-75 BINGO BOARD -->
+            <!-- LEFT 75 BOARD -->
             <div style="flex:1.2; background:#1e1a3a; border-radius:10px; padding:6px;">
                 <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:4px; text-align:center; font-weight:bold; margin-bottom:5px;">
                     <div style="background:#3b82f6; border-radius:4px;">B</div>
@@ -257,41 +149,40 @@
                     <div style="background:#22c55e; border-radius:4px;">G</div>
                     <div style="background:#f97316; border-radius:4px;">O</div>
                 </div>
-                <div id="board75Grid" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:3px; max-height:420px; overflow-y:auto;">
-                    <!-- 1 እስከ 75 ቁጥሮች በ JS ይፈጠራሉ -->
-                </div>
+                <div id="board75Grid" class="board-grid"></div>
             </div>
 
-            <!-- RIGHT: CALLING DISPLAY AREA -->
+            <!-- RIGHT CONTROL PANEL -->
             <div style="flex:1; display:flex; flex-direction:column; gap:10px;">
-                <!-- RECENT CALLED BALLS -->
-                <div id="recentBalls" style="display:flex; gap:4px; justify-content:center; min-height:30px;"></div>
-                
-                <!-- CURRENT CALLED BIG BALL -->
-                <div style="background:#1e1a3a; border-radius:12px; padding:20px; text-align:center;">
-                    <div id="currentBallDisplay" style="width:70px; height:70px; border-radius:50%; background:#fff; color:#000; font-size:24px; font-weight:bold; display:flex; align-items:center; justify-content:center; margin:0 auto; border:4px solid #eab308;">
+                <div style="background:#1e1a3a; border-radius:12px; padding:15px; text-align:center;">
+                    <div id="currentBallDisplay" style="width:65px; height:65px; border-radius:50%; background:#fff; color:#000; font-size:22px; font-weight:bold; display:flex; align-items:center; justify-content:center; margin:0 auto; border:4px solid #eab308;">
                         --
                     </div>
                 </div>
 
-                <!-- STATUS BOX -->
-                <div style="background:#1e1a3a; border-radius:12px; padding:15px; text-align:center; flex:1;">
-                    <h3 style="margin:0; font-size:16px;">WATCHING ONLY</h3>
-                    <p style="font-size:11px; color:#aaa; margin-top:10px;">የዚህ ዙር ጨዋታ ተጀምሯል። አዲስ ዙር እስኪጀምር እዚህ ይጠብቁ።</p>
+                <div style="background:#1e1a3a; border-radius:12px; padding:12px; text-align:center; flex:1;">
+                    <h4 style="margin:0; font-size:14px;">GAME ROOM</h4>
+                    <p style="font-size:11px; color:#aaa; margin-top:8px;">ጨዋታው በሂደት ላይ ይገኛል።</p>
                 </div>
             </div>
         </div>
 
-        <!-- BOTTOM ACTION BUTTONS -->
+        <!-- BOTTOM BUTTONS -->
         <div style="display:flex; gap:10px; margin-top:10px;">
-            <button onclick="leaveGame()" style="flex:1; background:#ef4444; color:#fff; padding:12px; border:none; border-radius:8px; font-weight:bold;">LEAVE</button>
-            <button onclick="refreshGame()" style="flex:1; background:#3b82f6; color:#fff; padding:12px; border:none; border-radius:8px; font-weight:bold;">REFRESH</button>
+            <button class="btn-action" onclick="leaveGame()" style="background:#ef4444;">LEAVE</button>
+            <button class="btn-action" onclick="refreshGame()" style="background:#3b82f6;">REFRESH</button>
         </div>
     </div>
-    <!-- ========================================== -->
 
-    <!-- የስክሪፕት ፋይሎች ከዚህ በታች ይቀጥላሉ -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- BOTTOM NAV BAR -->
+    <div class="bottom-nav">
+        <button class="nav-btn active" onclick="switchTab('game', this)"><i class="fa-solid fa-gamepad"></i><span>GAME</span></button>
+        <button class="nav-btn" onclick="switchTab('scores', this)"><i class="fa-solid fa-trophy"></i><span>SCORES</span></button>
+        <button class="nav-btn" onclick="switchTab('history', this)"><i class="fa-solid fa-clock-rotate-left"></i><span>HISTORY</span></button>
+        <button class="nav-btn" onclick="switchTab('wallet', this)"><i class="fa-solid fa-briefcase"></i><span>WALLET</span></button>
+        <button class="nav-btn" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i><span>PROFILE</span></button>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
