@@ -1,10 +1,9 @@
 // ==========================================
 // 1. Database Configuration (Direct REST API)
 // ==========================================
-const SUPABASE_URL = "https://eritlinwsctlbmqhbyju.supabase.co"; // መጨረሻ ላይ / እንዳይኖር!
+const SUPABASE_URL = "https://eritlinwsctlbmqhbyju.supabase.co"; 
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyaXRsaW53c2N0bGJtcWhieWp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTM5OTYsImV4cCI6MjEwNDg4OTk5Nn0.lLfbYZBEe6T0qry3xFJiWQGUxydd79LzfrMe8tc2ieo"; // የእርስዎን ANON KEY እዚህ ይተኩ
 
-// Direct HTTP Request Helper (Safe API Call)
 async function supabaseFetch(endpoint, options = {}) {
     const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
     const headers = {
@@ -29,52 +28,37 @@ async function supabaseFetch(endpoint, options = {}) {
 }
 
 // ==========================================
-// 2. Telegram WebApp Only Setup (የተስተካከለ)
+// 2. Safe Telegram User Detection
 // ==========================================
-let currentUser = null; // የ Test User መረጃ ሙሉ በሙሉ ተወግዷል
+let currentUser = { id: 6110364693, first_name: "Player", username: "player" };
 
-function initTelegramUser() {
-    if (window.Telegram && window.Telegram.WebApp) {
-        const tg = window.Telegram.WebApp;
-        
-        tg.ready();  // ቴሌግራም ዝግጁ መሆኑን ማረጋገጥ
-        tg.expand(); // አፑን ሙሉ ስክሪን ማድረግ
+function loadTelegramUser() {
+    try {
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
 
-        // ከቴሌግራም የእውነተኛ ተጠቃሚ መረጃ ማውጣት
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            currentUser = tg.initDataUnsafe.user;
-            console.log("Real Telegram User Successfully Loaded:", currentUser);
-            return true;
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                currentUser = tg.initDataUnsafe.user;
+                console.log("Real Telegram User Loaded:", currentUser);
+            }
         }
+    } catch (e) {
+        console.error("Telegram WebApp Error:", e);
     }
-    return false;
 }
 
-// ገጹ ሲከፈት (Page Load)
+// ገጹ ሲከፈት
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. የቴሌግራም ተጠቃሚ መኖሩን ማረጋገጥ
-    const isTelegram = initTelegramUser();
+    loadTelegramUser();
 
-    // ቴሌግራም ካልሆነ አፑን እንዳይሰራ ማድረግ
-    if (!isTelegram || !currentUser) {
-        document.body.innerHTML = `
-            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#121026; color:#fff; text-align:center; padding:20px; font-family:sans-serif;">
-                <h2 style="color:#ef4444;">⚠️ መግባት አልተቻለም!</h2>
-                <p>ይህ አፕሊኬሽን የሚሰራው በ <strong>Telegram Bot</strong> በኩል ሲከፈት ብቻ ነው።</p>
-                <p style="font-size:12px; color:#aaa; margin-top:10px;">እባክዎን አፑን ዘግተው በቴሌግራም ቦትዎ በኩል ይክፈቱት።</p>
-            </div>
-        `;
-        return;
-    }
-
-    // 2. በስክሪኑ ላይ የእውነተኛ ተጠቃሚ ስምና ፕሮፋይል ማሳየት
     const userNameElem = document.getElementById('userName');
     const userAvatarElem = document.getElementById('userAvatar');
     
     if (userNameElem) userNameElem.innerHTML = `${currentUser.first_name} <i class="fa-solid fa-gem vip-icon"></i>`;
     if (userAvatarElem) userAvatarElem.innerText = currentUser.first_name ? currentUser.first_name.charAt(0) : 'U';
 
-    // 3. ከዳታቤዝ ጋር ማያያዝ
     await syncUserWithDatabase(currentUser);
 });
 
@@ -82,17 +66,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 // 3. Database Sync Function
 // ==========================================
 async function syncUserWithDatabase(user) {
-    if (!SUPABASE_URL || SUPABASE_URL.includes("YOUR_PROJECT_ID")) {
-        console.warn("Supabase credentials have not been configured yet.");
-        return;
-    }
+    if (!SUPABASE_URL || SUPABASE_URL.includes("YOUR_PROJECT_ID")) return;
 
     try {
-        // 1. ተጠቃሚው መኖሩን መፈለግ
         const existingUsers = await supabaseFetch(`users?telegram_id=eq.${user.id}`);
         let userData = existingUsers && existingUsers.length > 0 ? existingUsers[0] : null;
 
-        // 2. ከሌለ አዲስ ማስገባት
         if (!userData) {
             const newUsers = await supabaseFetch('users', {
                 method: 'POST',
@@ -102,12 +81,9 @@ async function syncUserWithDatabase(user) {
                     username: user.username || ''
                 })
             });
-            if (newUsers && newUsers.length > 0) {
-                userData = newUsers[0];
-            }
+            if (newUsers && newUsers.length > 0) userData = newUsers[0];
         }
 
-        // 3. የሒሳብ መጠን (Balance) ማሳየት
         if (userData) {
             const formattedBalance = parseFloat(userData.balance || 0).toFixed(2) + " ETB";
             const userBal = document.getElementById('userBalance');
@@ -121,7 +97,7 @@ async function syncUserWithDatabase(user) {
 }
 
 // ==========================================
-// 4. Submit Deposit (የገቢ ጥያቄ መላኪያ)
+// 4. Submit Deposit
 // ==========================================
 async function submitDeposit() {
     const transIdElem = document.getElementById('transId');
@@ -135,15 +111,7 @@ async function submitDeposit() {
         return;
     }
 
-    if (!SUPABASE_URL || SUPABASE_URL.includes("YOUR_PROJECT_ID")) {
-        alert("እባክዎ በ app.js ላይ የ Supabase URL እና Key በትክክል ያስገቡ!");
-        return;
-    }
-
     try {
-        await syncUserWithDatabase(currentUser);
-
-        // የትራንዛክሽን ጥያቄ ወደ ዳታቤዝ መላክ
         await supabaseFetch('transactions', {
             method: 'POST',
             body: JSON.stringify({
@@ -169,7 +137,7 @@ async function submitDeposit() {
 }
 
 // ==========================================
-// 5. Navigation Tab Switcher (የታችኛው ማውጫ)
+// 5. Navigation Tab Switcher
 // ==========================================
 function switchTab(tabId, element) {
     const contents = document.querySelectorAll('.tab-content');
@@ -193,39 +161,7 @@ function switchTab(tabId, element) {
 }
 
 // ==========================================
-// 6. Bingo Room Functions
-// ==========================================
-function openBingoRoom(stake = "10 ETB", derash = 0) {
-    startBingoGameView(); // የቢንጎ ጨዋታ ገጹን ይከፍታል
-}
-    
-    const stakeElem = document.getElementById('selectedStake');
-    const stakeAmtElem = document.getElementById('stakeAmount');
-    const derashElem = document.getElementById('derashAmount');
-    
-    if (stakeElem) stakeElem.innerText = stake;
-    if (stakeAmtElem) stakeAmtElem.innerText = stake;
-    if (derashElem) derashElem.innerText = derash + " ETB";
-
-    const grid = document.getElementById('bingoGrid');
-    if (grid) {
-        grid.innerHTML = '';
-        for (let i = 1; i <= 200; i++) {
-            const box = document.createElement('div');
-            box.className = 'number-box';
-            box.innerText = i;
-            box.onclick = function() {
-                this.classList.toggle('selected');
-            };
-            grid.appendChild(box);
-        }
-    }
-}
-
-function closeBingoRoom() {
-
-    // ==========================================
-// BINGO LIVE GAME ENGINE logic
+// 6. BINGO LIVE GAME ENGINE
 // ==========================================
 let currentGameState = {
     gameId: "DBAP1Q6F",
@@ -236,7 +172,6 @@ let currentGameState = {
     stake: 10
 };
 
-// 1-75 ቦርድ መፍጠሪያ
 function render75Board() {
     const grid = document.getElementById('board75Grid');
     if (!grid) return;
@@ -251,14 +186,12 @@ function render75Board() {
     }
 }
 
-// ቁጥር ሲወጣ ቦርዱ ላይ ማብራት (Highlighting)
 function callNextNumber(num) {
     if (!num || currentGameState.calledNumbers.includes(num)) return;
 
     currentGameState.calledNumbers.push(num);
     currentGameState.currentBall = num;
 
-    // የደብዳቤ መለያ ማውጣት (B, I, N, G, O)
     let letter = '';
     if (num <= 15) letter = 'B';
     else if (num <= 30) letter = 'I';
@@ -268,35 +201,28 @@ function callNextNumber(num) {
 
     const formattedBall = `${letter}-${num}`;
 
-    // 1. Big Ball ማሳየት
     const ballElem = document.getElementById('currentBallDisplay');
     if (ballElem) ballElem.innerText = formattedBall;
 
-    // 2. ቦርድ ላይ ቀለሙን መቀየር (Green/Orange highlight)
     const cell = document.getElementById(`ball-${num}`);
     if (cell) {
-        cell.style.background = "#10b981"; // አረንጓዴ ቀለም
+        cell.style.background = "#10b981";
         cell.style.color = "#fff";
     }
 
-    // 3. ቆጣሪዎችን ማሻሻል
     const countElem = document.getElementById('calledCount');
     if (countElem) countElem.innerText = currentGameState.calledNumbers.length;
 }
 
-// ጨዋታውን መጀመር እና 75 ቦርድ ማዘጋጀት
 function startBingoGameView() {
     const gameScreen = document.getElementById('bingoGameScreen');
     if (gameScreen) gameScreen.style.display = 'block';
 
     render75Board();
-    
-    // ለሙከራ ቁጥር በየ 3 ሰከንዱ እንዲወጣ ማድረግ (Simulate Server Calls)
-    let testNumber = 1;
+
     const interval = setInterval(() => {
         if (currentGameState.calledNumbers.length >= 75) {
             clearInterval(interval);
-            showWinnerModal(); // ጨዋታው ሲያልቅ አሸናፊ ማሳየት
             return;
         }
         let randomNum = Math.floor(Math.random() * 75) + 1;
@@ -307,9 +233,8 @@ function startBingoGameView() {
     }, 3000);
 }
 
-// አሸናፊዎች ሲወጡ የሚታይ Modal (ምስል 2)
-function showWinnerModal() {
-    alert("🎉 BINGO! 2 PLAYERS WON!\n አሸናፊዎች፦ Rahwa Emiru & Mesfen Mesfen");
+function openBingoRoom(stake = "10 ETB", derash = 0) {
+    startBingoGameView();
 }
 
 function leaveGame() {
@@ -319,7 +244,4 @@ function leaveGame() {
 
 function refreshGame() {
     location.reload();
-}
-    const modal = document.getElementById('gameModal');
-    if (modal) modal.style.display = 'none';
 }
