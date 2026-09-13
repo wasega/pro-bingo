@@ -48,6 +48,27 @@ function openBingoRoom(stake = "10 ETB") {
 }
 
 // የቢንጎ ክፍሉን መዝጊያ
-function closeBingoRoom() {
-    document.getElementById('gameModal').style.display = 'none';
+// ቢንጎ ክፍሉን መክፈቻ እና ከ 1 እስከ 200 ቁጥሮችን ሰሌዳው ላይ መፍጠሪያ
+function openBingoRoom(stake = "10 ETB", derash = 0) {
+    document.getElementById('gameModal').style.display = 'block';
+    document.getElementById('selectedStake').innerText = stake;
+    document.getElementById('stakeAmount').innerText = stake;
+    document.getElementById('derashAmount').innerText = derash + " ETB";
+
+    const grid = document.getElementById('bingoGrid');
+    grid.innerHTML = ''; // አሮጌውን ማጽጃ
+
+    // ከ 1 እስከ 200 ቁጥሮችን በራስ-ሰር ሰሌዳው ላይ መፍጠር
+    for (let i = 1; i <= 200; i++) {
+        const box = document.createElement('div');
+        box.className = 'number-box';
+        box.innerText = i;
+        
+        // ቁጥር ሲጫኑ መምረጫ
+        box.onclick = function() {
+            this.classList.toggle('selected');
+        };
+
+        grid.appendChild(box);
+    }
 }
